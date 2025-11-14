@@ -100,29 +100,41 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const cartItem = await prisma.cartItem.upsert({
+    // Find existing cart item for non-variant products
+    const existingItem = await prisma.cartItem.findFirst({
       where: {
-        userId_productId_variantId: {
-          userId: session.user.id,
-          productId,
-          variantId: null as string | null,
-        },
-      },
-      update: {
-        quantity: {
-          increment: quantity || 1,
-        },
-      },
-      create: {
         userId: session.user.id,
         productId,
         variantId: null,
-        quantity: quantity || 1,
-      },
-      include: {
-        product: true,
       },
     })
+
+    let cartItem
+    if (existingItem) {
+      cartItem = await prisma.cartItem.update({
+        where: { id: existingItem.id },
+        data: {
+          quantity: {
+            increment: quantity || 1,
+          },
+        },
+        include: {
+          product: true,
+        },
+      })
+    } else {
+      cartItem = await prisma.cartItem.create({
+        data: {
+          userId: session.user.id,
+          productId,
+          variantId: null,
+          quantity: quantity || 1,
+        },
+        include: {
+          product: true,
+        },
+      })
+    }
 
     return NextResponse.json(cartItem)
   } catch (error) {
