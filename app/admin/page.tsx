@@ -18,6 +18,9 @@ interface Product {
   subcategory?: string | null
   isActive: boolean
   colors?: any[]
+  // Legacy fields for backward compatibility
+  price?: number
+  stock?: number
 }
 
 export default function AdminPage() {

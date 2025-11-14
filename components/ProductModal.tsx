@@ -25,11 +25,15 @@ interface Product {
   id: string
   name: string
   description: string
-  price: number
-  image: string
+  basePrice?: number | null
+  image?: string | null
   category: string
-  stock: number
+  subcategory?: string | null
   isActive: boolean
+  colors?: any[]
+  // Legacy fields for backward compatibility
+  price?: number
+  stock?: number
 }
 
 interface ProductModalProps {
