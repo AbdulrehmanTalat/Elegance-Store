@@ -38,7 +38,8 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   if (hasVariantsWithData && product.colors) {
     // Get all variant prices
-    const variantPrices = product.colors
+    const colors = product.colors // Store in local variable for type narrowing
+    const variantPrices = colors
       .flatMap(color => color.variants || [])
       .map(v => v.price)
       .filter(price => price > 0)
@@ -53,7 +54,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     }
     
     // Calculate total stock from variants
-    totalStock = product.colors
+    totalStock = colors
       .flatMap(color => color.variants || [])
       .reduce((sum, v) => sum + (v.stock || 0), 0)
   } else {
