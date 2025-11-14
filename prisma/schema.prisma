@@ -1,0 +1,207 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  ONLINE
+  COD
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String?
+  role          UserRole  @default(USER)
+  emailVerified Boolean   @default(false)
+  otp           String?
+  otpExpires    DateTime?
+  phone         String?
+  address       String?
+  city          String?
+  state         String?
+  zipCode       String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  orders        Order[]
+  cartItems     CartItem[]
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+enum ProductCategory {
+  UNDERGARMENTS
+  JEWELRY
+  MAKEUP
+}
+
+enum UndergarmentSubcategory {
+  LINGERIE
+  BRA
+  PANTIES
+  BRA_PANTIES_SET
+  THONGS
+  BIKINI
+  LOUNGE_WEAR
+  PLUS_SIZE_LINGERIE
+}
+
+model Product {
+  id          String          @id @default(cuid())
+  name        String
+  description String          @db.Text
+  basePrice   Float?          // Base price (optional, variants can override)
+  image       String?         // Default/thumbnail image
+  category    ProductCategory
+  subcategory UndergarmentSubcategory? // Subcategory for undergarments
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  colors      ProductColor[]
+  cartItems  CartItem[]
+  orderItems  OrderItem[]
+}
+
+model ProductColor {
+  id        String   @id @default(cuid())
+  productId String
+  name      String   // e.g., "Rose Madder", "Black", "White"
+  images    String[] // Array of image URLs for this color
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variants  ProductVariant[]
+  
+  @@index([productId])
+}
+
+model ProductVariant {
+  id          String        @id @default(cuid())
+  colorId     String
+  bandSize    String?       // e.g., "34", "36", "38" (for bras)
+  cupSize     String?       // e.g., "75B", "75C", "80B", "80C" (for bras)
+  size        String?       // e.g., "S", "M", "L", "XL" (for nighties, etc.)
+  price       Float         // Price for this specific variant
+  stock       Int           @default(0)
+  sku         String?       // Optional SKU
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  color       ProductColor  @relation(fields: [colorId], references: [id], onDelete: Cascade)
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+  
+  @@unique([colorId, bandSize, cupSize, size])
+  @@index([colorId])
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  userId   String
+  productId String
+  variantId String?  // Optional: if product has variants
+  quantity Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  variant  ProductVariant? @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, productId, variantId])
+}
+
+model Order {
+  id            String        @id @default(cuid())
+  userId        String
+  totalAmount   Float
+  status        OrderStatus  @default(PENDING)
+  paymentMethod PaymentMethod
+  paymentStatus PaymentStatus @default(PENDING)
+  shippingAddress String      @db.Text
+  phone         String
+  email         String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  user          User          @relation(fields: [userId], references: [id])
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  variantId String?  // Optional: variant information
+  colorName String?  // Store color name for order history
+  bandSize  String?  // Store band size
+  cupSize   String?  // Store cup size
+  quantity  Int
+  price     Float
+  createdAt DateTime @default(now())
+  product   Product @relation(fields: [productId], references: [id])
+  variant   ProductVariant? @relation(fields: [variantId], references: [id])
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
