@@ -57,7 +57,7 @@ export default function ProductVariantSelector({
           variants
             .filter((v) => v.colorId === selectedColor?.id)
             .map((v) => v.bandSize)
-            .filter(Boolean)
+            .filter((size): size is string => Boolean(size))
         )
       ).sort()
     : []
@@ -72,7 +72,7 @@ export default function ProductVariantSelector({
                 v.colorId === selectedColor?.id && v.bandSize === selectedBandSize
             )
             .map((v) => v.cupSize)
-            .filter(Boolean)
+            .filter((size): size is string => Boolean(size))
         )
       ).sort()
     : []
@@ -84,7 +84,7 @@ export default function ProductVariantSelector({
           variants
             .filter((v) => v.colorId === selectedColor?.id)
             .map((v) => v.size)
-            .filter(Boolean)
+            .filter((size): size is string => Boolean(size))
         )
       ).sort()
     : []
@@ -215,7 +215,11 @@ export default function ProductVariantSelector({
             {availableBandSizes.map((size) => (
               <button
                 key={size}
-                onClick={() => setSelectedBandSize(size)}
+                onClick={() => {
+                  if (size) {
+                    setSelectedBandSize(size)
+                  }
+                }}
                 className={`px-4 py-2 rounded-lg border-2 transition ${
                   selectedBandSize === size
                     ? 'border-black bg-primary-50 text-primary-700 font-semibold'
@@ -254,7 +258,11 @@ export default function ProductVariantSelector({
                 >
                   <div className="flex items-center gap-4">
                     <button
-                      onClick={() => setSelectedCupSize(cupSize)}
+                      onClick={() => {
+                        if (cupSize) {
+                          setSelectedCupSize(cupSize)
+                        }
+                      }}
                       className={`px-4 py-2 rounded-lg border-2 transition ${
                         selectedCupSize === cupSize
                           ? 'border-black bg-primary-50 text-primary-700 font-semibold'
@@ -334,7 +342,11 @@ export default function ProductVariantSelector({
                 >
                   <div className="flex items-center gap-4">
                     <button
-                      onClick={() => setSelectedSize(size)}
+                      onClick={() => {
+                        if (size) {
+                          setSelectedSize(size)
+                        }
+                      }}
                       className={`px-4 py-2 rounded-lg border-2 transition ${
                         selectedSize === size
                           ? 'border-black bg-primary-50 text-primary-700 font-semibold'
