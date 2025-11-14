@@ -36,7 +36,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   let priceText = ''
   let totalStock = 0
 
-  if (hasVariantsWithData) {
+  if (hasVariantsWithData && product.colors) {
     // Get all variant prices
     const variantPrices = product.colors
       .flatMap(color => color.variants || [])
@@ -66,7 +66,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   // Get display image (prioritize variant images, then product image)
   let displayImage: string | null = null
   
-  if (hasVariants) {
+  if (hasVariants && product.colors) {
     // Try to find first color with images
     for (const color of product.colors) {
       if (color.images && color.images.length > 0) {
