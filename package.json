@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "setup-admin": "node scripts/setup-admin.js",
+    "sync-env": "node scripts/sync-env-to-vercel.js",
     "postinstall": "prisma generate"
   },
   "dependencies": {

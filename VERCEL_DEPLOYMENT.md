@@ -1,5 +1,51 @@
 # Vercel Deployment Guide
 
+## Quick Setup with Vercel CLI (Recommended)
+
+The easiest way to sync your local `.env` file to Vercel is using the Vercel CLI:
+
+1. **Install Vercel CLI** (if not already installed):
+   ```bash
+   npm i -g vercel
+   ```
+
+2. **Login to Vercel**:
+   ```bash
+   vercel login
+   ```
+
+3. **Link your project** (if not already linked):
+   ```bash
+   vercel link
+   ```
+
+4. **Pull environment variables from Vercel** (to see what's already set):
+   ```bash
+   vercel env pull .env.production
+   ```
+
+5. **Push your local `.env` to Vercel**:
+   ```bash
+   vercel env add DATABASE_URL production
+   vercel env add NEXTAUTH_SECRET production
+   vercel env add NEXTAUTH_URL production
+   # ... repeat for each variable
+   ```
+
+   Or use this one-liner to add all variables from your `.env` file:
+   ```bash
+   # For Windows PowerShell:
+   Get-Content .env | ForEach-Object { if ($_ -match '^([^=]+)=(.*)$') { vercel env add $matches[1] production $matches[2] } }
+   
+   # For Linux/Mac:
+   cat .env | grep -v '^#' | grep -v '^$' | while IFS='=' read -r key value; do echo "$value" | vercel env add "$key" production; done
+   ```
+
+6. **Redeploy** after adding variables:
+   ```bash
+   vercel --prod
+   ```
+
 ## Required Environment Variables
 
 You need to set the following environment variables in your Vercel project settings:
