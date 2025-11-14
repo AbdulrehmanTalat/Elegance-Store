@@ -3,11 +3,13 @@
 import { useCartStore } from '@/store/cart-store'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Minus, Plus, Trash2, ShoppingBag } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 
 export default function CartPage() {
   const { data: session } = useSession()
+  const router = useRouter()
   const items = useCartStore((state) => state.items)
   const updateQuantity = useCartStore((state) => state.updateQuantity)
   const removeItem = useCartStore((state) => state.removeItem)
@@ -19,12 +21,12 @@ export default function CartPage() {
         <ShoppingBag size={64} className="mx-auto text-gray-400 mb-4" />
         <h2 className="text-2xl font-bold mb-4">Your cart is empty</h2>
         <p className="text-gray-600 mb-8">Start shopping to add items to your cart</p>
-        <Link
-          href="/products"
+        <button
+          onClick={() => router.push('/products')}
           className="bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition inline-block"
         >
           Browse Products
-        </Link>
+        </button>
       </div>
     )
   }
