@@ -85,10 +85,19 @@ export async function POST(req: NextRequest) {
           )
           const image = color?.images?.[0] || product.image || ''
 
+          // Build size label from variant or stored order item data
+          const sizeLabel = variant.size 
+            ? variant.size 
+            : variant.bandSize && variant.cupSize
+            ? `${variant.bandSize} ${variant.cupSize}`
+            : item.bandSize && item.cupSize
+            ? `${item.bandSize} ${item.cupSize}`
+            : item.colorName || ''
+
           cartItems.push({
             productId: item.productId,
             variantId: item.variantId,
-            name: `${product.name} - ${item.colorName || ''} ${item.bandSize || ''} ${item.cupSize || ''} ${item.size || ''}`.trim(),
+            name: `${product.name}${sizeLabel ? ` - ${sizeLabel}` : ''}`.trim(),
             price: variant.price,
             image,
             quantity: availableQuantity,
