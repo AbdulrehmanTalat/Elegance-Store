@@ -27,6 +27,8 @@ yarn-error.log*
 # local env files
 .env*.local
 # .env - REMOVED: Now committed for Vercel auto-detection
+# TODO: When deploying to live server, uncomment the line below to ignore .env
+# .env
 # WARNING: Make sure your .env file doesn't contain sensitive production secrets
 
 # vercel

@@ -2,12 +2,18 @@
 
 ## Automatic Environment Variable Detection
 
-**Note:** Your `.env` file is now committed to the repository. Vercel will automatically detect and use environment variables from committed `.env` files.
+**Note:** Your `.env` file is currently committed to the repository for easy Vercel deployment.
 
 **⚠️ Security Warning:** 
 - Only commit `.env` if you're okay with secrets being in your repository
-- For production, consider using Vercel's environment variable dashboard instead
+- For production/live server deployment, you should move `.env` back to `.gitignore`
 - Make sure your repository is private if committing `.env` files
+
+**To move `.env` back to gitignore for live server:**
+1. Uncomment the `.env` line in `.gitignore`
+2. Remove `.env` from git: `git rm --cached .env`
+3. Commit the changes
+4. Set environment variables directly on your live server/Vercel dashboard
 
 ## Quick Setup with Vercel CLI (Alternative Method)
 
