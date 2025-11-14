@@ -28,9 +28,9 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   // Calculate price display
   const hasVariants = product.colors && product.colors.length > 0
-  const hasVariantsWithData = hasVariants && product.colors.some(color => 
+  const hasVariantsWithData = hasVariants && (product.colors?.some(color => 
     color.variants && color.variants.length > 0
-  )
+  ) ?? false)
   
   let displayPrice: number | null = null
   let priceText = ''
