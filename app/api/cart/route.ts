@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
         userId_productId_variantId: {
           userId: session.user.id,
           productId,
-          variantId: undefined,
+          variantId: null as string | null,
         },
       },
       update: {
@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
       create: {
         userId: session.user.id,
         productId,
-        variantId: undefined,
+        variantId: null,
         quantity: quantity || 1,
       },
       include: {
