@@ -25,6 +25,11 @@ export async function POST(req: NextRequest) {
         items: {
           include: {
             product: true,
+            variant: {
+              include: {
+                color: true,
+              },
+            },
           },
         },
       },
@@ -49,21 +54,58 @@ export async function POST(req: NextRequest) {
     for (const item of order.items) {
       const product = await prisma.product.findUnique({
         where: { id: item.productId },
+        include: {
+          colors: {
+            include: {
+              variants: true,
+            },
+          },
+        },
       })
 
       if (!product || !product.isActive) {
         continue // Skip unavailable products
       }
 
-      const availableQuantity = Math.min(item.quantity, product.stock)
-      if (availableQuantity > 0) {
-        cartItems.push({
-          productId: item.productId,
-          name: product.name,
-          price: product.price,
-          image: product.image,
-          quantity: availableQuantity,
+      // Handle variant products
+      if (item.variantId) {
+        const variant = await prisma.productVariant.findUnique({
+          where: { id: item.variantId },
         })
+
+        if (!variant || variant.stock <= 0) {
+          continue // Skip out of stock variants
+        }
+
+        const availableQuantity = Math.min(item.quantity, variant.stock)
+        if (availableQuantity > 0) {
+          // Get color image for variant
+          const color = product.colors.find(c => 
+            c.variants.some(v => v.id === item.variantId)
+          )
+          const image = color?.images?.[0] || product.image || ''
+
+          cartItems.push({
+            productId: item.productId,
+            variantId: item.variantId,
+            name: `${product.name} - ${item.colorName || ''} ${item.bandSize || ''} ${item.cupSize || ''} ${item.size || ''}`.trim(),
+            price: variant.price,
+            image,
+            quantity: availableQuantity,
+          })
+        }
+      } else {
+        // Handle non-variant products (use basePrice if available)
+        const price = product.basePrice || 0
+        if (price > 0) {
+          cartItems.push({
+            productId: item.productId,
+            name: product.name,
+            price,
+            image: product.image || '',
+            quantity: item.quantity,
+          })
+        }
       }
     }
 
