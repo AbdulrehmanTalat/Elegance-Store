@@ -26,7 +26,8 @@ yarn-error.log*
 
 # local env files
 .env*.local
-.env
+# .env - REMOVED: Now committed for Vercel auto-detection
+# WARNING: Make sure your .env file doesn't contain sensitive production secrets
 
 # vercel
 .vercel

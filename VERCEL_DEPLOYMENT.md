@@ -1,6 +1,15 @@
 # Vercel Deployment Guide
 
-## Quick Setup with Vercel CLI (Recommended)
+## Automatic Environment Variable Detection
+
+**Note:** Your `.env` file is now committed to the repository. Vercel will automatically detect and use environment variables from committed `.env` files.
+
+**⚠️ Security Warning:** 
+- Only commit `.env` if you're okay with secrets being in your repository
+- For production, consider using Vercel's environment variable dashboard instead
+- Make sure your repository is private if committing `.env` files
+
+## Quick Setup with Vercel CLI (Alternative Method)
 
 The easiest way to sync your local `.env` file to Vercel is using the Vercel CLI:
 
