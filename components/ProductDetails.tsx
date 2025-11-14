@@ -15,8 +15,9 @@ interface Variant {
   id: string
   colorId: string
   colorName: string
-  bandSize: string
-  cupSize: string
+  bandSize?: string | null
+  cupSize?: string | null
+  size?: string | null
   price: number
   stock: number
 }
