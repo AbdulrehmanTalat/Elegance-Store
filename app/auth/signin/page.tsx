@@ -61,6 +61,9 @@ function SignInForm() {
         email: data.email,
         password: data.password,
         redirect: false,
+        callbackUrl: callbackUrl !== '/' && callbackUrl !== '/auth/signin' && !callbackUrl.startsWith('/auth/')
+          ? callbackUrl
+          : '/profile',
       })
 
       if (result?.error) {
@@ -70,15 +73,16 @@ function SignInForm() {
           setError('Invalid email or password')
         }
       } else if (result?.ok) {
-        // Sign-in successful - wait a moment for cookie to be set, then redirect
+        // Sign-in successful - wait for cookie to be set, then redirect
+        // Use a longer delay to ensure cookie is definitely set
         setTimeout(() => {
           const targetUrl = callbackUrl && callbackUrl !== '/' && callbackUrl !== '/auth/signin' && !callbackUrl.startsWith('/auth/')
             ? callbackUrl
             : '/profile'
           
-          // Hard redirect to break any loops
+          // Hard redirect - this will trigger middleware which will check token
           window.location.href = targetUrl
-        }, 100)
+        }, 500)
       }
     } catch (error) {
       setError('An error occurred. Please try again.')
