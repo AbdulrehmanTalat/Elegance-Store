@@ -18,11 +18,29 @@ type SignInFormData = z.infer<typeof signInSchema>
 function SignInForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/'
+  const rawCallbackUrl = searchParams.get('callbackUrl') || '/'
   const { data: session, status } = useSession()
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [isRedirecting, setIsRedirecting] = useState(false)
+
+  // Extract path from callbackUrl (handle both full URLs and paths)
+  const getCallbackPath = (url: string): string => {
+    try {
+      // If it's a full URL, extract the path
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        const urlObj = new URL(url)
+        return urlObj.pathname + urlObj.search
+      }
+      // If it's already a path, return as is
+      return url
+    } catch {
+      // If URL parsing fails, treat as path
+      return url.startsWith('/') ? url : `/${url}`
+    }
+  }
+
+  const callbackUrl = getCallbackPath(rawCallbackUrl)
 
   const {
     register,
@@ -41,7 +59,8 @@ function SignInForm() {
       // If user is already signed in, redirect based on role
       if (session.user.role === 'ADMIN') {
         // Use router.replace to avoid adding to history and prevent loops
-        if (window.location.pathname !== '/admin') {
+        const currentPath = window.location.pathname
+        if (currentPath !== '/admin') {
           router.replace('/admin')
         }
       } else {
@@ -50,15 +69,19 @@ function SignInForm() {
         const currentPath = window.location.pathname
         let targetUrl = '/profile'
         
-        if (callbackUrl && 
-            callbackUrl !== '/' && 
-            callbackUrl !== '/auth/signin' && 
-            !callbackUrl.startsWith('/auth/') &&
-            callbackUrl !== currentPath) {
-          targetUrl = callbackUrl
+        // Clean callbackUrl - remove query params and ensure it's a valid path
+        const cleanCallback = callbackUrl.split('?')[0]
+        
+        if (cleanCallback && 
+            cleanCallback !== '/' && 
+            cleanCallback !== '/auth/signin' && 
+            !cleanCallback.startsWith('/auth/') &&
+            cleanCallback !== currentPath &&
+            cleanCallback.startsWith('/')) {
+          targetUrl = cleanCallback
         }
         
-        if (currentPath !== targetUrl) {
+        if (currentPath !== targetUrl && targetUrl !== '/auth/signin') {
           router.replace(targetUrl)
         }
       }
@@ -105,7 +128,10 @@ function SignInForm() {
               return getSessionWithRetry(retries - 1)
             } else {
               // Fallback to default redirect
-              const targetUrl = callbackUrl !== '/' && callbackUrl !== '/auth/signin' ? callbackUrl : '/profile'
+              const cleanCallback = callbackUrl.split('?')[0]
+              const targetUrl = cleanCallback && cleanCallback !== '/' && cleanCallback !== '/auth/signin' && cleanCallback.startsWith('/') 
+                ? cleanCallback 
+                : '/profile'
               router.replace(targetUrl)
             }
           } catch (err) {
@@ -114,7 +140,10 @@ function SignInForm() {
               return getSessionWithRetry(retries - 1)
             } else {
               // Fallback to default redirect
-              const targetUrl = callbackUrl !== '/' && callbackUrl !== '/auth/signin' ? callbackUrl : '/profile'
+              const cleanCallback = callbackUrl.split('?')[0]
+              const targetUrl = cleanCallback && cleanCallback !== '/' && cleanCallback !== '/auth/signin' && cleanCallback.startsWith('/') 
+                ? cleanCallback 
+                : '/profile'
               router.replace(targetUrl)
             }
           }
