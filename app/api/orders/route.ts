@@ -111,21 +111,8 @@ export async function POST(req: NextRequest) {
       },
     })
 
-    // Update stock
-    for (const item of items) {
-      if (item.variantId) {
-        // Update variant stock
-        await prisma.productVariant.update({
-          where: { id: item.variantId },
-          data: {
-            stock: {
-              decrement: item.quantity,
-            },
-          },
-        })
-      }
-      // Note: Non-variant products don't have stock field anymore
-    }
+    // Note: Stock will be decremented when order is confirmed (not at creation)
+    // This prevents stock issues if order is cancelled or payment fails
 
     // Prepare order items for email
     const emailItems = order.items.map((item) => {

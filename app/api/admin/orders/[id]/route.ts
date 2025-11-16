@@ -39,6 +39,28 @@ export async function PUT(
       updateData.paymentStatus = 'FAILED'
     }
 
+    // Get the current order to check previous status
+    const currentOrder = await prisma.order.findUnique({
+      where: { id: params.id },
+      include: {
+        items: {
+          include: {
+            variant: true,
+          },
+        },
+      },
+    })
+
+    if (!currentOrder) {
+      return NextResponse.json(
+        { error: 'Order not found' },
+        { status: 404 }
+      )
+    }
+
+    const previousStatus = currentOrder.status
+    const newStatus = validatedData.status as OrderStatus
+
     const order = await prisma.order.update({
       where: { id: params.id },
       data: updateData,
@@ -55,6 +77,54 @@ export async function PUT(
         },
       },
     })
+
+    // Handle stock updates based on status change
+    if (newStatus === 'CONFIRMED' && previousStatus !== 'CONFIRMED') {
+      // Check stock availability before confirming
+      for (const item of order.items) {
+        if (item.variantId) {
+          const variant = await prisma.productVariant.findUnique({
+            where: { id: item.variantId },
+          })
+          if (!variant || variant.stock < item.quantity) {
+            return NextResponse.json(
+              { error: `Insufficient stock for ${item.product.name}. Available: ${variant?.stock || 0}, Required: ${item.quantity}` },
+              { status: 400 }
+            )
+          }
+        }
+      }
+      
+      // Decrement stock when order is confirmed
+      for (const item of order.items) {
+        if (item.variantId) {
+          await prisma.productVariant.update({
+            where: { id: item.variantId },
+            data: {
+              stock: {
+                decrement: item.quantity,
+              },
+            },
+          })
+        }
+      }
+    } else if (newStatus === 'CANCELLED' && previousStatus !== 'CANCELLED') {
+      // Restore stock when order is cancelled (only if it was previously confirmed)
+      if (previousStatus === 'CONFIRMED') {
+        for (const item of order.items) {
+          if (item.variantId) {
+            await prisma.productVariant.update({
+              where: { id: item.variantId },
+              data: {
+                stock: {
+                  increment: item.quantity,
+                },
+              },
+            })
+          }
+        }
+      }
+    }
 
     // Prepare order items for email
     const emailItems = order.items.map((item) => {

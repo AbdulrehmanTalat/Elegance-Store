@@ -41,6 +41,51 @@ export async function POST(req: NextRequest) {
     const orderId = session.metadata?.orderId
 
     if (orderId) {
+      // First, fetch the order to check stock before updating
+      const orderToCheck = await prisma.order.findUnique({
+        where: { id: orderId },
+        include: {
+          items: {
+            include: {
+              product: true,
+              variant: true,
+            },
+          },
+        },
+      })
+
+      if (!orderToCheck) {
+        return NextResponse.json(
+          { error: 'Order not found' },
+          { status: 404 }
+        )
+      }
+
+      // Check stock availability before confirming
+      for (const item of orderToCheck.items) {
+        if (item.variantId) {
+          const variant = await prisma.productVariant.findUnique({
+            where: { id: item.variantId },
+          })
+          if (!variant || variant.stock < item.quantity) {
+            // Update order status to indicate stock issue
+            await prisma.order.update({
+              where: { id: orderId },
+              data: {
+                status: 'CANCELLED',
+                paymentStatus: 'FAILED',
+              },
+            })
+            console.error(`Insufficient stock for order ${orderId}, item ${item.product.name}. Available: ${variant?.stock || 0}, Required: ${item.quantity}`)
+            return NextResponse.json(
+              { error: 'Insufficient stock' },
+              { status: 400 }
+            )
+          }
+        }
+      }
+
+      // Stock is available, update order to confirmed
       const order = await prisma.order.update({
         where: { id: orderId },
         data: {
@@ -61,6 +106,20 @@ export async function POST(req: NextRequest) {
           },
         },
       })
+
+      // Decrement stock for confirmed order
+      for (const item of order.items) {
+        if (item.variantId) {
+          await prisma.productVariant.update({
+            where: { id: item.variantId },
+            data: {
+              stock: {
+                decrement: item.quantity,
+              },
+            },
+          })
+        }
+      }
 
       // Prepare order items for email
       const emailItems = order.items.map((item) => {
