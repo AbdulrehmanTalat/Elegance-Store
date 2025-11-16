@@ -48,12 +48,12 @@ export default function AdminPage() {
     if (status === 'loading') return
 
     if (!session || session.user.role !== 'ADMIN') {
-      router.push('/')
+      window.location.href = '/'
       return
     }
 
     fetchProducts()
-  }, [session, status, router])
+  }, [session, status])
 
   const fetchProducts = async () => {
     try {

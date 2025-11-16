@@ -38,13 +38,13 @@ function SignInForm() {
     if (session?.user) {
       // If user is already signed in, redirect based on role
       if (session.user.role === 'ADMIN') {
-        router.push('/admin')
+        window.location.href = '/admin'
       } else {
         // For regular users, use callbackUrl if provided, otherwise go to profile
-        router.push(callbackUrl !== '/' ? callbackUrl : '/profile')
+        window.location.href = callbackUrl !== '/' ? callbackUrl : '/profile'
       }
     }
-  }, [session, status, router, callbackUrl])
+  }, [session, status, callbackUrl])
 
   const onSubmit = async (data: SignInFormData) => {
     setLoading(true)
