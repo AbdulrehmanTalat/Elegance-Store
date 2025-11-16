@@ -107,16 +107,32 @@ export const authOptions: NextAuthOptions = {
       return session
     },
     async redirect({ url, baseUrl }) {
-      // Handle redirects after sign-in
-      // If url is a callbackUrl, use it
+      // Parse the URL to handle both relative and absolute paths
+      let targetUrl = url
+      
+      // If it's a relative path, make it absolute
       if (url.startsWith('/')) {
-        // Don't redirect back to sign-in
-        if (url === '/auth/signin' || url.startsWith('/auth/')) {
+        targetUrl = `${baseUrl}${url}`
+      }
+      
+      // Parse to get the pathname
+      try {
+        const parsed = new URL(targetUrl)
+        const pathname = parsed.pathname
+        
+        // Never redirect back to sign-in or auth pages
+        if (pathname === '/auth/signin' || pathname.startsWith('/auth/')) {
           return `${baseUrl}/profile`
         }
-        return `${baseUrl}${url}`
+        
+        // If it's the same origin, return the full URL
+        if (parsed.origin === baseUrl) {
+          return targetUrl
+        }
+      } catch {
+        // If URL parsing fails, just return baseUrl
       }
-      if (new URL(url).origin === baseUrl) return url
+      
       return baseUrl
     },
   },

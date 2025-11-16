@@ -1,16 +1,17 @@
 'use client'
 
-import { useState, Suspense, useEffect } from 'react'
-import { signIn, useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import Link from 'next/link'
+import { signIn, useSession } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { Suspense } from 'react'
+import Link from 'next/link'
+import { useToast } from '@/components/ToastProvider'
 
 const signInSchema = z.object({
   email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string().min(1, 'Password is required'),
 })
 
 type SignInFormData = z.infer<typeof signInSchema>
@@ -18,29 +19,9 @@ type SignInFormData = z.infer<typeof signInSchema>
 function SignInForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const rawCallbackUrl = searchParams.get('callbackUrl') || '/'
+  const callbackUrl = searchParams.get('callbackUrl') || '/profile'
   const { data: session, status } = useSession()
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
-
-  // Extract path from callbackUrl (handle both full URLs and paths)
-  const getCallbackPath = (url: string): string => {
-    try {
-      // If it's a full URL, extract the path
-      if (url.startsWith('http://') || url.startsWith('https://')) {
-        const urlObj = new URL(url)
-        return urlObj.pathname + urlObj.search
-      }
-      // If it's already a path, return as is
-      return url
-    } catch {
-      // If URL parsing fails, treat as path
-      return url.startsWith('/') ? url : `/${url}`
-    }
-  }
-
-  const callbackUrl = getCallbackPath(rawCallbackUrl)
-
+  const { showError } = useToast()
   const {
     register,
     handleSubmit,
@@ -49,120 +30,68 @@ function SignInForm() {
     resolver: zodResolver(signInSchema),
   })
 
-  // Don't redirect here - let middleware handle it to prevent loops
-  // Just show loading state if authenticated
-
   const onSubmit = async (data: SignInFormData) => {
-    setLoading(true)
-    setError('')
-
     try {
-      // Determine target URL
-      const targetUrl = callbackUrl && callbackUrl !== '/' && callbackUrl !== '/auth/signin' && !callbackUrl.startsWith('/auth/')
-        ? callbackUrl
-        : '/profile'
-
-      const result = await signIn('credentials', {
+      // Use NextAuth's built-in redirect
+      await signIn('credentials', {
         email: data.email,
         password: data.password,
-        redirect: true, // Let NextAuth handle redirect
-        callbackUrl: targetUrl,
+        redirect: true,
+        callbackUrl: callbackUrl !== '/' && callbackUrl !== '/auth/signin' && !callbackUrl.startsWith('/auth/')
+          ? callbackUrl
+          : '/profile',
       })
-
-      // If redirect is true, NextAuth will handle it, so we don't need to do anything
-      // This code only runs if redirect: false was used
-      if (result?.error) {
-        if (result.error === 'Please verify your email first') {
-          setError('Please verify your email first. Check your inbox for the verification code.')
-        } else {
-          setError('Invalid email or password')
-        }
-      }
     } catch (error) {
-      setError('An error occurred. Please try again.')
-    } finally {
-      setLoading(false)
+      showError('An error occurred. Please try again.')
     }
-  }
-
-  // Show loading state while checking session
-  if (status === 'loading') {
-    return (
-      <div className="container mx-auto px-4 py-16">
-        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
-          <h1 className="text-3xl font-bold text-center mb-8">Sign In</h1>
-          <div className="text-center">Loading...</div>
-        </div>
-      </div>
-    )
-  }
-
-  // If authenticated, layout should have redirected, but as fallback:
-  if (session?.user) {
-    // Use meta refresh as absolute last resort
-    return (
-      <>
-        <meta httpEquiv="refresh" content="0;url=/profile" />
-        <div className="container mx-auto px-4 py-16">
-          <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
-            <h1 className="text-3xl font-bold text-center mb-8">Sign In</h1>
-            <div className="text-center">Redirecting...</div>
-          </div>
-        </div>
-      </>
-    )
   }
 
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
         <h1 className="text-3xl font-bold text-center mb-8">Sign In</h1>
-        
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium mb-2">Email</label>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              Email
+            </label>
             <input
-              type="email"
               {...register('email')}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2"
+              type="email"
+              id="email"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               placeholder="Enter your email"
             />
             {errors.email && (
-              <p className="text-red-600 text-sm mt-1">{errors.email.message}</p>
+              <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Password</label>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              Password
+            </label>
             <input
-              type="password"
               {...register('password')}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2"
+              type="password"
+              id="password"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               placeholder="Enter your password"
             />
             {errors.password && (
-              <p className="text-red-600 text-sm mt-1">
-                {errors.password.message}
-              </p>
+              <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
             )}
           </div>
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="w-full bg-primary-600 text-white py-2 px-4 rounded-md hover:bg-primary-700 transition-colors"
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            Sign In
           </button>
         </form>
 
-        <p className="text-center mt-4 text-gray-600">
+        <p className="mt-4 text-center text-sm text-gray-600">
           Don't have an account?{' '}
           <Link href="/auth/signup" className="text-primary-600 hover:underline">
             Sign up
@@ -174,18 +103,9 @@ function SignInForm() {
 }
 
 export default function SignInPage() {
-  // Middleware should handle redirects, but show minimal UI while redirecting
   return (
-    <Suspense fallback={
-      <div className="container mx-auto px-4 py-16">
-        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
-          <h1 className="text-3xl font-bold text-center mb-8">Sign In</h1>
-          <div className="text-center">Loading...</div>
-        </div>
-      </div>
-    }>
+    <Suspense fallback={<div className="container mx-auto px-4 py-16">Loading...</div>}>
       <SignInForm />
     </Suspense>
   )
 }
-
