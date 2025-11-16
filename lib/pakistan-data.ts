@@ -339,5 +339,5 @@ export const pakistanCities = [
 ]
 
 // Sort cities alphabetically
-export const sortedPakistanCities = [...new Set(pakistanCities)].sort()
+export const sortedPakistanCities = Array.from(new Set(pakistanCities)).sort()
 
