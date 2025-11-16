@@ -8,9 +8,15 @@ import { useToast } from '@/components/ToastProvider'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import Image from 'next/image'
+import { pakistanProvinces, sortedPakistanCities } from '@/lib/pakistan-data'
 
 const checkoutSchema = z.object({
-  shippingAddress: z.string().min(10, 'Address must be at least 10 characters'),
+  streetAddress1: z.string().min(5, 'Street Address 1 must be at least 5 characters'),
+  streetAddress2: z.string().optional(),
+  city: z.string().min(1, 'Please select a city'),
+  state: z.string().min(1, 'Please select a state/province'),
+  zipCode: z.string().min(4, 'Zip code must be at least 4 characters'),
   phone: z.string().min(10, 'Phone number must be at least 10 digits'),
   paymentMethod: z.enum(['ONLINE', 'COD']),
 })
@@ -42,6 +48,17 @@ export default function CheckoutPage() {
 
     setLoading(true)
 
+    // Build complete shipping address
+    const shippingAddress = [
+      data.streetAddress1,
+      data.streetAddress2,
+      data.city,
+      data.state,
+      data.zipCode,
+    ]
+      .filter(Boolean)
+      .join(', ')
+
     try {
       const response = await fetch('/api/orders', {
         method: 'POST',
@@ -54,7 +71,7 @@ export default function CheckoutPage() {
             price: item.price,
             name: item.name, // Include name for error messages
           })),
-          shippingAddress: data.shippingAddress,
+          shippingAddress: shippingAddress,
           phone: data.phone,
           paymentMethod: data.paymentMethod,
         }),
@@ -117,36 +134,118 @@ export default function CheckoutPage() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-2">
-                Shipping Address
+                Street Address 1 <span className="text-red-500">*</span>
               </label>
-              <textarea
-                {...register('shippingAddress')}
+              <input
+                type="text"
+                {...register('streetAddress1')}
                 className="w-full border border-gray-300 rounded-lg px-4 py-2"
-                rows={4}
-                placeholder="Enter your complete shipping address"
+                placeholder="House/Flat number, Street name"
               />
-              {errors.shippingAddress && (
+              {errors.streetAddress1 && (
                 <p className="text-red-600 text-sm mt-1">
-                  {errors.shippingAddress.message}
+                  {errors.streetAddress1.message}
                 </p>
               )}
             </div>
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                Phone Number
+                Street Address 2 (Optional)
               </label>
               <input
-                type="tel"
-                {...register('phone')}
+                type="text"
+                {...register('streetAddress2')}
                 className="w-full border border-gray-300 rounded-lg px-4 py-2"
-                placeholder="Enter your phone number"
+                placeholder="Apartment, suite, unit, building, floor, etc."
               />
-              {errors.phone && (
+              {errors.streetAddress2 && (
                 <p className="text-red-600 text-sm mt-1">
-                  {errors.phone.message}
+                  {errors.streetAddress2.message}
                 </p>
               )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  City <span className="text-red-500">*</span>
+                </label>
+                <select
+                  {...register('city')}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                >
+                  <option value="">Select a city</option>
+                  {sortedPakistanCities.map((city) => (
+                    <option key={city} value={city}>
+                      {city}
+                    </option>
+                  ))}
+                </select>
+                {errors.city && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {errors.city.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  State/Province <span className="text-red-500">*</span>
+                </label>
+                <select
+                  {...register('state')}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                >
+                  <option value="">Select a state</option>
+                  {pakistanProvinces.map((province) => (
+                    <option key={province} value={province}>
+                      {province}
+                    </option>
+                  ))}
+                </select>
+                {errors.state && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {errors.state.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Zip/Postal Code <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  {...register('zipCode')}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                  placeholder="e.g., 54000"
+                />
+                {errors.zipCode && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {errors.zipCode.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Phone Number <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  {...register('phone')}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                  placeholder="e.g., 03001234567"
+                />
+                {errors.phone && (
+                  <p className="text-red-600 text-sm mt-1">
+                    {errors.phone.message}
+                  </p>
+                )}
+              </div>
             </div>
 
             <div>
@@ -194,20 +293,41 @@ export default function CheckoutPage() {
         <div>
           <h2 className="text-2xl font-semibold mb-4">Order Summary</h2>
           <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="space-y-2 mb-4">
+            <div className="space-y-4 mb-4">
               {items.map((item) => (
-                <div key={item.id} className="flex justify-between">
-                  <span>
-                    {item.name} x {item.quantity}
-                  </span>
-                  <span>Rs {(item.price * item.quantity).toFixed(2)}</span>
+                <div key={item.id} className="flex gap-4 pb-4 border-b last:border-0">
+                  <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-200">
+                    {item.image ? (
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                        No Image
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-gray-900 truncate">
+                      {item.name}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Quantity: {item.quantity}
+                    </p>
+                    <p className="text-lg font-semibold text-primary-600 mt-1">
+                      Rs {(item.price * item.quantity).toFixed(2)}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
             <div className="border-t pt-4">
               <div className="flex justify-between text-xl font-bold">
                 <span>Total</span>
-                <span>Rs {getTotal().toFixed(2)}</span>
+                <span className="text-primary-600">Rs {getTotal().toFixed(2)}</span>
               </div>
             </div>
           </div>

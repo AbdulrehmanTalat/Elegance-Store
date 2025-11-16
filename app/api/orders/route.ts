@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { sendOrderConfirmationEmail } from '@/lib/email'
+import { sendOrderConfirmationEmail, sendAdminOrderNotificationEmail } from '@/lib/email'
 import Stripe from 'stripe'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -88,6 +88,7 @@ export async function POST(req: NextRequest) {
                   variantData.colorName = variant.color.name
                   variantData.bandSize = variant.bandSize
                   variantData.cupSize = variant.cupSize
+                  // Note: size is stored in variant, not OrderItem (schema limitation)
                 }
               }
 
@@ -96,7 +97,18 @@ export async function POST(req: NextRequest) {
           ),
         },
       },
-      include: { items: true },
+      include: {
+        items: {
+          include: {
+            product: true,
+            variant: {
+              include: {
+                color: true,
+              },
+            },
+          },
+        },
+      },
     })
 
     // Update stock
@@ -115,11 +127,61 @@ export async function POST(req: NextRequest) {
       // Note: Non-variant products don't have stock field anymore
     }
 
-    // Send confirmation email
+    // Prepare order items for email
+    const emailItems = order.items.map((item) => {
+      let image: string | null = null
+      
+      // Get image from variant color or product
+      if (item.variant?.color?.images && item.variant.color.images.length > 0) {
+        image = item.variant.color.images[0]
+      } else if (item.product.image) {
+        image = item.product.image
+      }
+      
+      // Return base product name (variant info will be shown separately in email)
+      return {
+        productName: item.product.name, // Base product name only
+        quantity: item.quantity,
+        price: item.price,
+        image,
+        colorName: item.colorName,
+        bandSize: item.bandSize || item.variant?.bandSize || null,
+        cupSize: item.cupSize || item.variant?.cupSize || null,
+        size: item.variant?.size || null,
+      }
+    })
+
+    // Send confirmation email to customer
     await sendOrderConfirmationEmail(
       session.user.email!,
       order.id,
-      totalAmount
+      totalAmount,
+      shippingAddress,
+      phone,
+      emailItems,
+      order.createdAt
+    )
+
+    // Get admin emails and send notification
+    const admins = await prisma.user.findMany({
+      where: { role: 'ADMIN' },
+      select: { email: true },
+    })
+
+    // Send notification to all admins
+    await Promise.all(
+      admins.map((admin) =>
+        sendAdminOrderNotificationEmail(
+          admin.email,
+          order.id,
+          totalAmount,
+          session.user.email!,
+          shippingAddress,
+          phone,
+          emailItems,
+          order.createdAt
+        )
+      )
     )
 
     if (paymentMethod === 'ONLINE') {

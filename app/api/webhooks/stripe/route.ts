@@ -49,13 +49,51 @@ export async function POST(req: NextRequest) {
         },
         include: {
           user: true,
+          items: {
+            include: {
+              product: true,
+              variant: {
+                include: {
+                  color: true,
+                },
+              },
+            },
+          },
         },
+      })
+
+      // Prepare order items for email
+      const emailItems = order.items.map((item) => {
+        let image: string | null = null
+        
+        // Get image from variant color or product
+        if (item.variant?.color?.images && item.variant.color.images.length > 0) {
+          image = item.variant.color.images[0]
+        } else if (item.product.image) {
+          image = item.product.image
+        }
+        
+        return {
+          productName: item.product.name,
+          quantity: item.quantity,
+          price: item.price,
+          image,
+          colorName: item.colorName,
+          bandSize: item.bandSize || item.variant?.bandSize || null,
+          cupSize: item.cupSize || item.variant?.cupSize || null,
+          size: item.variant?.size || null,
+        }
       })
 
       await sendOrderStatusUpdateEmail(
         order.email,
         order.id,
-        'CONFIRMED'
+        'CONFIRMED',
+        order.totalAmount,
+        order.shippingAddress,
+        order.phone,
+        emailItems,
+        order.createdAt
       )
     }
   }
