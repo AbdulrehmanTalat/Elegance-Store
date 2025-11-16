@@ -42,8 +42,8 @@ export default function Navbar() {
             {session ? (
               <div className="flex items-center space-x-4">
                 <Link
-                  href="/profile"
-                  className="flex items-center space-x-1 hover:text-primary-600 transition"
+                  href={session.user?.role === 'ADMIN' ? '/admin' : '/profile'}
+                  className="flex items-center space-x-1 hover:text-primary-600 transition cursor-pointer"
                 >
                   <User size={20} />
                   <span>{session.user?.name || session.user?.email}</span>
@@ -102,8 +102,8 @@ export default function Navbar() {
             {session ? (
               <div className="space-y-2">
                 <Link
-                  href="/profile"
-                  className="flex items-center space-x-2 hover:text-primary-600 transition"
+                  href={session.user?.role === 'ADMIN' ? '/admin' : '/profile'}
+                  className="flex items-center space-x-2 hover:text-primary-600 transition cursor-pointer"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   <User size={20} />
