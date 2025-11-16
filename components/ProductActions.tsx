@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ShoppingCart } from 'lucide-react'
 import { useCartStore } from '@/store/cart-store'
+import { useToast } from '@/components/ToastProvider'
 import { Product } from '@prisma/client'
 
 interface ProductActionsProps {
@@ -11,6 +12,7 @@ interface ProductActionsProps {
 
 export default function ProductActions({ product }: ProductActionsProps) {
   const addItem = useCartStore((state) => state.addItem)
+  const { showSuccess } = useToast()
   const [quantity, setQuantity] = useState(1)
 
   const handleAddToCart = () => {
@@ -28,6 +30,7 @@ export default function ProductActions({ product }: ProductActionsProps) {
         productId: product.id,
       })
       setQuantity(1)
+      showSuccess('Item added to cart!')
     }
   }
 

@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { Plus, Edit, Trash2, Key, Palette } from 'lucide-react'
 import ProductModal from '@/components/ProductModal'
 import ProductVariantModal from '@/components/ProductVariantModal'
+import { useToast } from '@/components/ToastProvider'
 
 interface Product {
   id: string
@@ -26,6 +27,7 @@ interface Product {
 export default function AdminPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const { showSuccess } = useToast()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -186,7 +188,7 @@ export default function AdminPage() {
         return
       }
 
-      alert('Password changed successfully!')
+      showSuccess('Password changed successfully!')
       setShowPasswordModal(false)
       setPasswordData({
         currentPassword: '',

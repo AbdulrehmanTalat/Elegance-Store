@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { useToast } from '@/components/ToastProvider'
 
 const signUpSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -26,6 +27,7 @@ type VerifyOTPFormData = z.infer<typeof verifyOTPSchema>
 
 export default function SignUpPage() {
   const router = useRouter()
+  const { showSuccess } = useToast()
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState<'signup' | 'verify'>('signup')
@@ -125,7 +127,7 @@ export default function SignUpPage() {
         return
       }
 
-      alert('OTP resent to your email!')
+      showSuccess('OTP resent to your email!')
     } catch (error) {
       setError('An error occurred. Please try again.')
     } finally {

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useCartStore } from '@/store/cart-store'
+import { useToast } from '@/components/ToastProvider'
 import { RotateCcw } from 'lucide-react'
 
 interface Order {
@@ -26,6 +27,7 @@ interface Order {
 export default function ProfilePage() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const { showError, showSuccess } = useToast()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [reordering, setReordering] = useState<string | null>(null)
@@ -66,7 +68,7 @@ export default function ProfilePage() {
       const result = await response.json()
 
       if (!response.ok) {
-        alert(result.error || 'Failed to reorder')
+        showError(result.error || 'Failed to reorder')
         return
       }
 
@@ -83,11 +85,12 @@ export default function ProfilePage() {
         }
       }
 
+      showSuccess('Items added to cart!')
       // Navigate to cart
       router.push('/cart')
     } catch (error) {
       console.error('Error reordering:', error)
-      alert('An error occurred while reordering')
+      showError('An error occurred while reordering')
     } finally {
       setReordering(null)
     }

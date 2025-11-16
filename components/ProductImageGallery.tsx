@@ -17,7 +17,14 @@ export default function ProductImageGallery({
   const [isZoomed, setIsZoomed] = useState(false)
   const [zoomPosition, setZoomPosition] = useState({ x: 50, y: 50 })
   const [showFullscreen, setShowFullscreen] = useState(false)
+  const [imageErrors, setImageErrors] = useState<Set<number>>(new Set())
   const imageRef = useRef<HTMLDivElement>(null)
+
+  // Reset selectedImage when images change (e.g., when switching colors)
+  useEffect(() => {
+    setSelectedImage(0)
+    setImageErrors(new Set())
+  }, [images?.length, images?.[0]]) // Reset when images array changes
 
   useEffect(() => {
     if (showFullscreen) {
@@ -43,12 +50,54 @@ export default function ProductImageGallery({
     })
   }
 
-  if (!images || images.length === 0) {
+  // Ensure selectedImage is within bounds
+  const validSelectedImage = images && images.length > 0 
+    ? Math.min(selectedImage, images.length - 1)
+    : 0
+
+  // Filter out images that have errored
+  const availableImages = images.filter((_, index) => !imageErrors.has(index))
+  
+  if (!images || images.length === 0 || availableImages.length === 0) {
     return (
       <div className="relative h-[600px] w-full bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
         <span className="text-gray-400">No Image</span>
       </div>
     )
+  }
+
+  // Find the current valid image index
+  const getCurrentImageIndex = () => {
+    if (!imageErrors.has(validSelectedImage)) {
+      return validSelectedImage
+    }
+    // Find next available image
+    const nextIndex = images.findIndex((_, i) => i > validSelectedImage && !imageErrors.has(i))
+    if (nextIndex !== -1) return nextIndex
+    const prevIndex = images.findIndex((_, i) => i < validSelectedImage && !imageErrors.has(i))
+    if (prevIndex !== -1) return prevIndex
+    return availableImages.length > 0 ? images.indexOf(availableImages[0]) : 0
+  }
+  
+  const currentImageIndex = getCurrentImageIndex()
+
+  const handleImageError = (index: number) => {
+    setImageErrors((prev) => {
+      const newErrors = new Set(prev).add(index)
+      // Skip to next available image if current one fails
+      if (index === validSelectedImage) {
+        const nextIndex = images.findIndex((_, i) => i > index && !newErrors.has(i))
+        if (nextIndex !== -1) {
+          setSelectedImage(nextIndex)
+        } else {
+          const prevIndex = images.findIndex((_, i) => i < index && !newErrors.has(i))
+          if (prevIndex !== -1) {
+            setSelectedImage(prevIndex)
+          }
+        }
+      }
+      return newErrors
+    })
   }
 
   return (
@@ -70,16 +119,15 @@ export default function ProductImageGallery({
               transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
             }}
           >
-            <Image
-              src={images[selectedImage]}
-              alt={`${productName} - Image ${selectedImage + 1}`}
-              fill
-              className="object-contain"
-              onError={(e) => {
-                ;(e.target as HTMLImageElement).src =
-                  'https://via.placeholder.com/400?text=Invalid+Image'
-              }}
-            />
+            {!imageErrors.has(currentImageIndex) && (
+              <Image
+                src={images[currentImageIndex]}
+                alt={`${productName} - Image ${currentImageIndex + 1}`}
+                fill
+                className="object-contain"
+                onError={() => handleImageError(currentImageIndex)}
+              />
+            )}
           </div>
           <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
             <ZoomIn size={20} />
@@ -87,28 +135,28 @@ export default function ProductImageGallery({
         </div>
         {images.length > 1 && (
           <div className="flex gap-2 overflow-x-auto">
-            {images.map((img, index) => (
-              <button
-                key={index}
-                onClick={() => setSelectedImage(index)}
-                className={`relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 transition ${
-                  selectedImage === index
-                    ? 'border-primary-600 ring-2 ring-primary-300'
-                    : 'border-gray-300 hover:border-gray-400'
-                }`}
-              >
-                <Image
-                  src={img}
-                  alt={`${productName} - Thumbnail ${index + 1}`}
-                  fill
-                  className="object-cover"
-                  onError={(e) => {
-                    ;(e.target as HTMLImageElement).src =
-                      'https://via.placeholder.com/80?text=Invalid'
-                  }}
-                />
-              </button>
-            ))}
+            {images.map((img, index) => {
+              if (imageErrors.has(index)) return null
+              return (
+                <button
+                  key={index}
+                  onClick={() => setSelectedImage(Math.min(index, images.length - 1))}
+                  className={`relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 transition ${
+                    currentImageIndex === index
+                      ? 'border-primary-600 ring-2 ring-primary-300'
+                      : 'border-gray-300 hover:border-gray-400'
+                  }`}
+                >
+                  <Image
+                    src={img}
+                    alt={`${productName} - Thumbnail ${index + 1}`}
+                    fill
+                    className="object-cover"
+                    onError={() => handleImageError(index)}
+                  />
+                </button>
+              )
+            })}
           </div>
         )}
       </div>
@@ -126,24 +174,26 @@ export default function ProductImageGallery({
             <X size={32} />
           </button>
           <div className="relative max-w-7xl max-h-full w-full h-full flex items-center justify-center">
-            <Image
-              src={images[selectedImage]}
-              alt={`${productName} - Fullscreen Image ${selectedImage + 1}`}
-              width={1200}
-              height={1200}
-              className="max-w-full max-h-full object-contain"
-              onError={(e) => {
-                ;(e.target as HTMLImageElement).src =
-                  'https://via.placeholder.com/400?text=Invalid+Image'
-              }}
-            />
+            {!imageErrors.has(currentImageIndex) && (
+              <Image
+                src={images[currentImageIndex]}
+                alt={`${productName} - Fullscreen Image ${currentImageIndex + 1}`}
+                width={1200}
+                height={1200}
+                className="max-w-full max-h-full object-contain"
+                onError={() => handleImageError(currentImageIndex)}
+              />
+            )}
           </div>
           {images.length > 1 && (
             <>
               <button
                 onClick={(e) => {
                   e.stopPropagation()
-                  setSelectedImage((prev) => (prev > 0 ? prev - 1 : images.length - 1))
+                  setSelectedImage((prev) => {
+                    const newIndex = prev > 0 ? prev - 1 : images.length - 1
+                    return Math.min(newIndex, images.length - 1)
+                  })
                 }}
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300 transition bg-black bg-opacity-50 p-3 rounded-full"
               >
@@ -165,7 +215,10 @@ export default function ProductImageGallery({
               <button
                 onClick={(e) => {
                   e.stopPropagation()
-                  setSelectedImage((prev) => (prev < images.length - 1 ? prev + 1 : 0))
+                  setSelectedImage((prev) => {
+                    const newIndex = prev < images.length - 1 ? prev + 1 : 0
+                    return Math.min(newIndex, images.length - 1)
+                  })
                 }}
                 className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:text-gray-300 transition bg-black bg-opacity-50 p-3 rounded-full"
               >
@@ -190,10 +243,10 @@ export default function ProductImageGallery({
                     key={index}
                     onClick={(e) => {
                       e.stopPropagation()
-                      setSelectedImage(index)
+                      setSelectedImage(Math.min(index, images.length - 1))
                     }}
                     className={`w-3 h-3 rounded-full transition ${
-                      selectedImage === index
+                      currentImageIndex === index
                         ? 'bg-white'
                         : 'bg-white bg-opacity-50 hover:bg-opacity-75'
                     }`}

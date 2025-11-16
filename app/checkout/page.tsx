@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/store/cart-store'
+import { useToast } from '@/components/ToastProvider'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -19,6 +20,7 @@ type CheckoutFormData = z.infer<typeof checkoutSchema>
 export default function CheckoutPage() {
   const { data: session } = useSession()
   const router = useRouter()
+  const { showError } = useToast()
   const items = useCartStore((state) => state.items)
   const getTotal = useCartStore((state) => state.getTotal)
   const clearCart = useCartStore((state) => state.clearCart)
@@ -72,7 +74,7 @@ export default function CheckoutPage() {
       }
     } catch (error) {
       console.error('Checkout error:', error)
-      alert('An error occurred. Please try again.')
+      showError('An error occurred. Please try again.')
     } finally {
       setLoading(false)
     }

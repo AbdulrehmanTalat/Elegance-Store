@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { ShoppingCart } from 'lucide-react'
 import { useCartStore } from '@/store/cart-store'
+import { useToast } from '@/components/ToastProvider'
 import Image from 'next/image'
 
 interface Color {
@@ -40,6 +41,7 @@ export default function ProductVariantSelector({
   onColorChange,
 }: ProductVariantSelectorProps) {
   const addItem = useCartStore((state) => state.addItem)
+  const { showSuccess, showWarning } = useToast()
   const [selectedColor, setSelectedColor] = useState<Color | null>(colors[0] || null)
   const [selectedBandSize, setSelectedBandSize] = useState<string>('')
   const [selectedCupSize, setSelectedCupSize] = useState<string>('')
@@ -152,9 +154,9 @@ export default function ProductVariantSelector({
 
     if (added) {
       setQuantities({})
-      alert('Items added to cart!')
+      showSuccess('Items added to cart!')
     } else {
-      alert('Please select at least one size and quantity')
+      showWarning('Please select at least one size and quantity')
     }
   }
 
