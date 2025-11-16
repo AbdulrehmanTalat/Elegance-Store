@@ -70,13 +70,15 @@ function SignInForm() {
           setError('Invalid email or password')
         }
       } else if (result?.ok) {
-        // Sign-in successful - use callbackUrl or default
-        const targetUrl = callbackUrl && callbackUrl !== '/' && callbackUrl !== '/auth/signin' && !callbackUrl.startsWith('/auth/')
-          ? callbackUrl
-          : '/profile'
-        
-        // Hard redirect to break any loops
-        window.location.href = targetUrl
+        // Sign-in successful - wait a moment for cookie to be set, then redirect
+        setTimeout(() => {
+          const targetUrl = callbackUrl && callbackUrl !== '/' && callbackUrl !== '/auth/signin' && !callbackUrl.startsWith('/auth/')
+            ? callbackUrl
+            : '/profile'
+          
+          // Hard redirect to break any loops
+          window.location.href = targetUrl
+        }, 100)
       }
     } catch (error) {
       setError('An error occurred. Please try again.')
