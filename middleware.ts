@@ -7,6 +7,14 @@ export default withAuth(
     const isAdmin = token?.role === 'ADMIN'
     const isAdminRoute = req.nextUrl.pathname.startsWith('/admin')
     const isProfileRoute = req.nextUrl.pathname.startsWith('/profile')
+    const isSignInPage = req.nextUrl.pathname.startsWith('/auth/signin')
+
+    // If authenticated user tries to access sign-in page, redirect them
+    if (token && isSignInPage) {
+      // Redirect admins to /admin, regular users to /profile
+      const targetPath = isAdmin ? '/admin' : '/profile'
+      return NextResponse.redirect(new URL(targetPath, req.url))
+    }
 
     // If admin tries to access profile, redirect to admin
     if (isProfileRoute && isAdmin) {

@@ -48,6 +48,13 @@ function SignInForm() {
 
   const callbackPath = getCallbackPath()
 
+  // Redirect authenticated users away from sign-in page
+  if (status === 'authenticated' && session) {
+    const targetPath = session.user?.role === 'ADMIN' ? '/admin' : '/profile'
+    router.replace(targetPath)
+    return null
+  }
+
   const onSubmit = async (data: SignInFormData) => {
     try {
       // Determine the target URL - use relative path for NextAuth
