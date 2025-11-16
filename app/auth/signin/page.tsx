@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, Suspense } from 'react'
-import { signIn } from 'next-auth/react'
+import { useState, Suspense, useEffect } from 'react'
+import { signIn, useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
@@ -19,6 +19,7 @@ function SignInForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/'
+  const { data: session, status } = useSession()
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -29,6 +30,21 @@ function SignInForm() {
   } = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema),
   })
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (status === 'loading') return
+
+    if (session?.user) {
+      // If user is already signed in, redirect based on role
+      if (session.user.role === 'ADMIN') {
+        router.push('/admin')
+      } else {
+        // For regular users, use callbackUrl if provided, otherwise go to profile
+        router.push(callbackUrl !== '/' ? callbackUrl : '/profile')
+      }
+    }
+  }, [session, status, router, callbackUrl])
 
   const onSubmit = async (data: SignInFormData) => {
     setLoading(true)
@@ -90,6 +106,30 @@ function SignInForm() {
     } finally {
       setLoading(false)
     }
+  }
+
+  // Show loading state while checking session
+  if (status === 'loading') {
+    return (
+      <div className="container mx-auto px-4 py-16">
+        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
+          <h1 className="text-3xl font-bold text-center mb-8">Sign In</h1>
+          <div className="text-center">Loading...</div>
+        </div>
+      </div>
+    )
+  }
+
+  // Don't render form if already authenticated (redirect is in progress)
+  if (session?.user) {
+    return (
+      <div className="container mx-auto px-4 py-16">
+        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
+          <h1 className="text-3xl font-bold text-center mb-8">Sign In</h1>
+          <div className="text-center">Redirecting...</div>
+        </div>
+      </div>
+    )
   }
 
   return (
