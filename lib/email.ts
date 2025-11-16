@@ -74,7 +74,7 @@ export async function sendOrderConfirmationEmail(
                   <!-- Promotional Banner -->
                   <tr>
                     <td style="padding: 0;">
-                      <img src="${getEmailImageUrl('banner-order.jpg')}" alt="Elegant Lingerie Collection" style="width: 100%; height: 200px; object-fit: cover; display: block; background-color: #f3f4f6;" />
+                      <img src="${getEmailImageUrl('banner-otp.png')}" alt="Elegant Lingerie Collection" style="width: 100%; height: 200px; object-fit: cover; display: block; background-color: #f3f4f6;" />
                     </td>
                   </tr>
                   
