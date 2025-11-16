@@ -24,13 +24,22 @@ const checkoutSchema = z.object({
 type CheckoutFormData = z.infer<typeof checkoutSchema>
 
 export default function CheckoutPage() {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const router = useRouter()
   const { showError } = useToast()
   const items = useCartStore((state) => state.items)
   const getTotal = useCartStore((state) => state.getTotal)
   const clearCart = useCartStore((state) => state.clearCart)
   const [loading, setLoading] = useState(false)
+
+  // Show loading while checking session
+  if (status === 'loading') {
+    return (
+      <div className="container mx-auto px-4 py-16 text-center">
+        <p className="text-xl">Loading...</p>
+      </div>
+    )
+  }
 
   const {
     register,

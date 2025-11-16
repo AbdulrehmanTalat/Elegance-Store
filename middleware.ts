@@ -54,8 +54,10 @@ export default withAuth(
           pathname.startsWith('/profile') ||
           pathname.startsWith('/orders')
         ) {
-          // If token exists (even empty object), allow access
-          return !!token
+          // CRITICAL: Explicitly check if token exists and is not null/undefined
+          // This prevents redirect loops when token is present but check fails
+          const hasToken = token !== null && token !== undefined
+          return hasToken
         }
 
         return true
