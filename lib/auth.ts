@@ -122,6 +122,7 @@ export const authOptions: NextAuthOptions = {
         
         // Never redirect back to sign-in or auth pages
         if (pathname === '/auth/signin' || pathname.startsWith('/auth/')) {
+          // Default to /profile - middleware will redirect admins to /admin
           return `${baseUrl}/profile`
         }
         
@@ -130,10 +131,11 @@ export const authOptions: NextAuthOptions = {
           return targetUrl
         }
       } catch {
-        // If URL parsing fails, just return baseUrl
+        // If URL parsing fails, default to /profile
       }
       
-      return baseUrl
+      // Default: redirect to /profile (middleware will handle admin redirect)
+      return `${baseUrl}/profile`
     },
   },
   pages: {

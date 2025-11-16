@@ -6,6 +6,12 @@ export default withAuth(
     const token = req.nextauth.token
     const isAdmin = token?.role === 'ADMIN'
     const isAdminRoute = req.nextUrl.pathname.startsWith('/admin')
+    const isProfileRoute = req.nextUrl.pathname.startsWith('/profile')
+
+    // If admin tries to access profile, redirect to admin
+    if (isProfileRoute && isAdmin) {
+      return NextResponse.redirect(new URL('/admin', req.url))
+    }
 
     // Non-admin trying to access admin route
     if (isAdminRoute && !isAdmin) {
