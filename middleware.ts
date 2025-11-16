@@ -89,6 +89,7 @@ export const config = {
     '/checkout/:path*',
     '/profile/:path*',
     '/orders/:path*',
+    '/auth/signin',
     '/auth/signin/:path*',
   ],
 }

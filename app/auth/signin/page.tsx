@@ -22,7 +22,6 @@ function SignInForm() {
   const { data: session, status } = useSession()
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [isRedirecting, setIsRedirecting] = useState(false)
 
   // Extract path from callbackUrl (handle both full URLs and paths)
   const getCallbackPath = (url: string): string => {
@@ -50,32 +49,8 @@ function SignInForm() {
     resolver: zodResolver(signInSchema),
   })
 
-  // Redirect if already authenticated - use hard redirect to break any loops
-  useEffect(() => {
-    if (status === 'loading' || isRedirecting) return
-
-    if (session?.user) {
-      setIsRedirecting(true)
-      // Use hard redirect to break any loops - middleware should handle this, but as fallback
-      if (session.user.role === 'ADMIN') {
-        window.location.href = '/admin'
-      } else {
-        // For regular users, use callbackUrl if provided, otherwise go to profile
-        const cleanCallback = callbackUrl.split('?')[0]
-        let targetUrl = '/profile'
-        
-        if (cleanCallback && 
-            cleanCallback !== '/' && 
-            cleanCallback !== '/auth/signin' && 
-            !cleanCallback.startsWith('/auth/') &&
-            cleanCallback.startsWith('/')) {
-          targetUrl = cleanCallback
-        }
-        
-        window.location.href = targetUrl
-      }
-    }
-  }, [session, status, callbackUrl, isRedirecting])
+  // Don't redirect here - let middleware handle it to prevent loops
+  // Just show loading state if authenticated
 
   const onSubmit = async (data: SignInFormData) => {
     setLoading(true)
@@ -159,13 +134,14 @@ function SignInForm() {
     )
   }
 
-  // Don't render form if already authenticated (redirect is in progress)
+  // If authenticated, middleware should have redirected already
+  // But if we're still here, show a simple message (shouldn't happen)
   if (session?.user) {
     return (
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
           <h1 className="text-3xl font-bold text-center mb-8">Sign In</h1>
-          <div className="text-center">Redirecting...</div>
+          <div className="text-center">You are already signed in. Redirecting...</div>
         </div>
       </div>
     )
@@ -232,6 +208,7 @@ function SignInForm() {
 }
 
 export default function SignInPage() {
+  // Middleware should handle redirects, but show minimal UI while redirecting
   return (
     <Suspense fallback={
       <div className="container mx-auto px-4 py-16">
