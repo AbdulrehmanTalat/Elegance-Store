@@ -90,12 +90,23 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60, // 24 hours - session is updated every 24 hours
+  },
+  jwt: {
+    maxAge: 30 * 24 * 60 * 60, // 30 days - JWT token expires after 30 days
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.role = (user as any).role
         token.id = user.id
+        // Set expiration to 30 days from now
+        token.exp = Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60)
+      }
+      // Update expiration on session update
+      if (trigger === 'update') {
+        token.exp = Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60)
       }
       return token
     },
