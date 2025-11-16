@@ -107,9 +107,15 @@ export const authOptions: NextAuthOptions = {
       return session
     },
     async redirect({ url, baseUrl }) {
-      // If redirecting to signin, check role and redirect accordingly
-      // This will be handled in the signin page, so just return the url
-      if (url.startsWith('/')) return `${baseUrl}${url}`
+      // Handle redirects after sign-in
+      // If url is a callbackUrl, use it
+      if (url.startsWith('/')) {
+        // Don't redirect back to sign-in
+        if (url === '/auth/signin' || url.startsWith('/auth/')) {
+          return `${baseUrl}/profile`
+        }
+        return `${baseUrl}${url}`
+      }
       if (new URL(url).origin === baseUrl) return url
       return baseUrl
     },

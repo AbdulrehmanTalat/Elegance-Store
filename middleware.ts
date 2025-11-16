@@ -69,15 +69,13 @@ export default withAuth(
           return token?.role === 'ADMIN' || false
         }
 
-        // Protect checkout and profile routes - return false to trigger NextAuth redirect
-        // BUT: if token exists, allow access (even if role is missing temporarily)
+        // Protect checkout and profile routes
         if (
           req.nextUrl.pathname.startsWith('/checkout') ||
           req.nextUrl.pathname.startsWith('/profile') ||
           req.nextUrl.pathname.startsWith('/orders')
         ) {
-          // If we have a token, allow access (session might be loading on client)
-          // Only block if there's absolutely no token
+          // Must have token to access
           return !!token
         }
 

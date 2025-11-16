@@ -70,53 +70,13 @@ function SignInForm() {
           setError('Invalid email or password')
         }
       } else if (result?.ok) {
-        // Fetch session to get user role and redirect accordingly
-        const getSessionWithRetry = async (retries = 3): Promise<void> => {
-          try {
-            const sessionResponse = await fetch('/api/auth/session', {
-              cache: 'no-store',
-            })
-            const session = await sessionResponse.json()
-            
-            if (session?.user?.role) {
-              // Use hard redirect to break any loops and ensure session is fully loaded
-              if (session.user.role === 'ADMIN') {
-                window.location.href = '/admin'
-              } else {
-                // Regular users go to profile/dashboard
-                const cleanCallback = callbackUrl.split('?')[0]
-                const targetUrl = cleanCallback && cleanCallback !== '/' && cleanCallback !== '/auth/signin' && cleanCallback.startsWith('/') && !cleanCallback.startsWith('/auth/')
-                  ? cleanCallback 
-                  : '/profile'
-                window.location.href = targetUrl
-              }
-              return // Exit function after redirect
-            } else if (retries > 0) {
-              // Retry if session not ready yet
-              await new Promise((resolve) => setTimeout(resolve, 300))
-              return getSessionWithRetry(retries - 1)
-            } else {
-              // Fallback to default redirect with hard redirect
-              const cleanCallback = callbackUrl.split('?')[0]
-              const targetUrl = cleanCallback && cleanCallback !== '/' && cleanCallback !== '/auth/signin' && cleanCallback.startsWith('/') && !cleanCallback.startsWith('/auth/')
-                ? cleanCallback 
-                : '/profile'
-              window.location.href = targetUrl
-              return
-            }
-          } catch (err) {
-            if (retries > 0) {
-              await new Promise((resolve) => setTimeout(resolve, 300))
-              return getSessionWithRetry(retries - 1)
-            } else {
-              // Fallback to default redirect with hard redirect
-              window.location.href = '/profile'
-              return
-            }
-          }
-        }
+        // Sign-in successful - use callbackUrl or default
+        const targetUrl = callbackUrl && callbackUrl !== '/' && callbackUrl !== '/auth/signin' && !callbackUrl.startsWith('/auth/')
+          ? callbackUrl
+          : '/profile'
         
-        await getSessionWithRetry()
+        // Hard redirect to break any loops
+        window.location.href = targetUrl
       }
     } catch (error) {
       setError('An error occurred. Please try again.')
