@@ -31,18 +31,23 @@ export default function ProfilePage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [reordering, setReordering] = useState<string | null>(null)
+  const [isRedirecting, setIsRedirecting] = useState(false)
   const addItem = useCartStore((state) => state.addItem)
 
   useEffect(() => {
-    if (status === 'loading') return
+    if (status === 'loading' || isRedirecting) return
 
     if (!session) {
-      router.push('/auth/signin')
+      setIsRedirecting(true)
+      // Only redirect if we're not already on the sign-in page
+      if (window.location.pathname !== '/auth/signin') {
+        router.replace('/auth/signin')
+      }
       return
     }
 
     fetchOrders()
-  }, [session, status, router])
+  }, [session, status, router, isRedirecting])
 
   const fetchOrders = async () => {
     try {

@@ -41,11 +41,26 @@ function SignInForm() {
       // If user is already signed in, redirect based on role
       if (session.user.role === 'ADMIN') {
         // Use router.replace to avoid adding to history and prevent loops
-        router.replace('/admin')
+        if (window.location.pathname !== '/admin') {
+          router.replace('/admin')
+        }
       } else {
         // For regular users, use callbackUrl if provided, otherwise go to profile
-        const targetUrl = callbackUrl !== '/' && callbackUrl !== '/auth/signin' ? callbackUrl : '/profile'
-        router.replace(targetUrl)
+        // Avoid redirecting to sign-in page or current page
+        const currentPath = window.location.pathname
+        let targetUrl = '/profile'
+        
+        if (callbackUrl && 
+            callbackUrl !== '/' && 
+            callbackUrl !== '/auth/signin' && 
+            !callbackUrl.startsWith('/auth/') &&
+            callbackUrl !== currentPath) {
+          targetUrl = callbackUrl
+        }
+        
+        if (currentPath !== targetUrl) {
+          router.replace(targetUrl)
+        }
       }
     }
   }, [session, status, callbackUrl, router, isRedirecting])
