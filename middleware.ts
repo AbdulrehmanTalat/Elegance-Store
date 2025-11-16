@@ -39,7 +39,6 @@ export default withAuth(
       }
       
       // Use absolute URL to ensure proper redirect with 307 (Temporary Redirect)
-      // 307 preserves the method and prevents caching issues
       const redirectUrl = new URL(targetPath, req.url)
       return NextResponse.redirect(redirectUrl, 307)
     }
@@ -64,9 +63,10 @@ export default withAuth(
           return true
         }
 
-        // Protect admin routes - return false to trigger NextAuth redirect
+        // Protect admin routes
         if (req.nextUrl.pathname.startsWith('/admin')) {
-          return token?.role === 'ADMIN' || false
+          // Return true if admin, false otherwise (NextAuth will redirect)
+          return token?.role === 'ADMIN' ? true : false
         }
 
         // Protect checkout and profile routes
@@ -75,8 +75,9 @@ export default withAuth(
           req.nextUrl.pathname.startsWith('/profile') ||
           req.nextUrl.pathname.startsWith('/orders')
         ) {
-          // Must have token to access
-          return !!token
+          // If token exists (even if just an empty object), allow access
+          // Only block if token is null or undefined
+          return token !== null && token !== undefined
         }
 
         return true
