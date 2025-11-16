@@ -22,6 +22,7 @@ function SignInForm() {
   const { data: session, status } = useSession()
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [isRedirecting, setIsRedirecting] = useState(false)
 
   const {
     register,
@@ -31,20 +32,23 @@ function SignInForm() {
     resolver: zodResolver(signInSchema),
   })
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated (only once)
   useEffect(() => {
-    if (status === 'loading') return
+    if (status === 'loading' || isRedirecting) return
 
     if (session?.user) {
+      setIsRedirecting(true)
       // If user is already signed in, redirect based on role
       if (session.user.role === 'ADMIN') {
-        window.location.href = '/admin'
+        // Use router.replace to avoid adding to history and prevent loops
+        router.replace('/admin')
       } else {
         // For regular users, use callbackUrl if provided, otherwise go to profile
-        window.location.href = callbackUrl !== '/' ? callbackUrl : '/profile'
+        const targetUrl = callbackUrl !== '/' && callbackUrl !== '/auth/signin' ? callbackUrl : '/profile'
+        router.replace(targetUrl)
       }
     }
-  }, [session, status, callbackUrl])
+  }, [session, status, callbackUrl, router, isRedirecting])
 
   const onSubmit = async (data: SignInFormData) => {
     setLoading(true)
@@ -75,10 +79,10 @@ function SignInForm() {
             if (session?.user?.role) {
               // Redirect based on role
               if (session.user.role === 'ADMIN') {
-                window.location.href = '/admin'
+                router.replace('/admin')
               } else {
                 // Regular users go to profile/dashboard
-                window.location.href = '/profile'
+                router.replace('/profile')
               }
             } else if (retries > 0) {
               // Retry if session not ready yet
@@ -86,7 +90,8 @@ function SignInForm() {
               return getSessionWithRetry(retries - 1)
             } else {
               // Fallback to default redirect
-              window.location.href = callbackUrl
+              const targetUrl = callbackUrl !== '/' && callbackUrl !== '/auth/signin' ? callbackUrl : '/profile'
+              router.replace(targetUrl)
             }
           } catch (err) {
             if (retries > 0) {
@@ -94,7 +99,8 @@ function SignInForm() {
               return getSessionWithRetry(retries - 1)
             } else {
               // Fallback to default redirect
-              window.location.href = callbackUrl
+              const targetUrl = callbackUrl !== '/' && callbackUrl !== '/auth/signin' ? callbackUrl : '/profile'
+              router.replace(targetUrl)
             }
           }
         }
