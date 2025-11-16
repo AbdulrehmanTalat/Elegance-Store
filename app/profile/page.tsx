@@ -31,20 +31,12 @@ export default function ProfilePage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [reordering, setReordering] = useState<string | null>(null)
-  const [isRedirecting, setIsRedirecting] = useState(false)
   const addItem = useCartStore((state) => state.addItem)
 
   useEffect(() => {
-    // Don't redirect if session is still loading
-    if (status === 'loading') return
-    
-    // Don't redirect if already redirecting
-    if (isRedirecting) return
-
-    // Only redirect if we're sure there's no session (not loading)
-    if (status === 'unauthenticated' && !session) {
-      setIsRedirecting(true)
-      window.location.href = '/auth/signin'
+    // Middleware handles authentication - don't redirect here
+    // Just wait for session to load and fetch orders
+    if (status === 'loading') {
       return
     }
 
@@ -52,7 +44,8 @@ export default function ProfilePage() {
     if (session) {
       fetchOrders()
     }
-  }, [session, status, isRedirecting])
+    // If no session after loading, middleware will handle redirect
+  }, [session, status])
 
   const fetchOrders = async () => {
     try {

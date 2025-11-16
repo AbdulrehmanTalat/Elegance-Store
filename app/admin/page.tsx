@@ -47,19 +47,15 @@ export default function AdminPage() {
   const [productSubcategory, setProductSubcategory] = useState<string | null>(null)
 
   useEffect(() => {
-    // Don't redirect if session is still loading
+    // Middleware handles authentication - don't redirect here
+    // Just wait for session to load and fetch products
     if (status === 'loading') return
-
-    // Only redirect if we're sure the user is not an admin
-    if (status === 'unauthenticated' || !session || session.user.role !== 'ADMIN') {
-      window.location.href = '/'
-      return
-    }
 
     // If we have an admin session, fetch products
     if (session && session.user.role === 'ADMIN') {
       fetchProducts()
     }
+    // If no session or not admin, middleware will handle redirect
   }, [session, status])
 
   const fetchProducts = async () => {
