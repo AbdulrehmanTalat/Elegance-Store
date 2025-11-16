@@ -57,32 +57,26 @@ function SignInForm() {
     setError('')
 
     try {
+      // Determine target URL
+      const targetUrl = callbackUrl && callbackUrl !== '/' && callbackUrl !== '/auth/signin' && !callbackUrl.startsWith('/auth/')
+        ? callbackUrl
+        : '/profile'
+
       const result = await signIn('credentials', {
         email: data.email,
         password: data.password,
-        redirect: false,
-        callbackUrl: callbackUrl !== '/' && callbackUrl !== '/auth/signin' && !callbackUrl.startsWith('/auth/')
-          ? callbackUrl
-          : '/profile',
+        redirect: true, // Let NextAuth handle redirect
+        callbackUrl: targetUrl,
       })
 
+      // If redirect is true, NextAuth will handle it, so we don't need to do anything
+      // This code only runs if redirect: false was used
       if (result?.error) {
         if (result.error === 'Please verify your email first') {
           setError('Please verify your email first. Check your inbox for the verification code.')
         } else {
           setError('Invalid email or password')
         }
-      } else if (result?.ok) {
-        // Sign-in successful - wait for cookie to be set, then redirect
-        // Use a longer delay to ensure cookie is definitely set
-        setTimeout(() => {
-          const targetUrl = callbackUrl && callbackUrl !== '/' && callbackUrl !== '/auth/signin' && !callbackUrl.startsWith('/auth/')
-            ? callbackUrl
-            : '/profile'
-          
-          // Hard redirect - this will trigger middleware which will check token
-          window.location.href = targetUrl
-        }, 500)
       }
     } catch (error) {
       setError('An error occurred. Please try again.')
