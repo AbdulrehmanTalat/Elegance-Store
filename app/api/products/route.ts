@@ -15,6 +15,8 @@ const productSchema = z.object({
   isActive: z.boolean().optional(),
 })
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)

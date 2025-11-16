@@ -6,6 +6,8 @@ import { sendOrderStatusUpdateEmail } from '@/lib/email'
 import { PaymentStatus, OrderStatus } from '@prisma/client'
 import { z } from 'zod'
 
+export const dynamic = 'force-dynamic'
+
 const updateOrderSchema = z.object({
   status: z.enum([
     'PENDING',
