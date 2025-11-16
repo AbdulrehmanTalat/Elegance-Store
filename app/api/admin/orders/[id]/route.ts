@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { sendOrderStatusUpdateEmail } from '@/lib/email'
-import { PaymentStatus } from '@prisma/client'
+import { PaymentStatus, OrderStatus } from '@prisma/client'
 import { z } from 'zod'
 
 const updateOrderSchema = z.object({
@@ -31,8 +31,8 @@ export async function PUT(
     const validatedData = updateOrderSchema.parse(body)
 
     // If order is cancelled, also update payment status to FAILED
-    const updateData: { status: string; paymentStatus?: PaymentStatus } = {
-      status: validatedData.status,
+    const updateData: { status: OrderStatus; paymentStatus?: PaymentStatus } = {
+      status: validatedData.status as OrderStatus,
     }
     
     if (validatedData.status === 'CANCELLED') {
