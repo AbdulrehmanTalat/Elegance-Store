@@ -35,16 +35,23 @@ export default function ProfilePage() {
   const addItem = useCartStore((state) => state.addItem)
 
   useEffect(() => {
-    if (status === 'loading' || isRedirecting) return
+    // Don't redirect if session is still loading
+    if (status === 'loading') return
+    
+    // Don't redirect if already redirecting
+    if (isRedirecting) return
 
-    if (!session) {
+    // Only redirect if we're sure there's no session (not loading)
+    if (status === 'unauthenticated' && !session) {
       setIsRedirecting(true)
-      // Use hard redirect to break any loops
       window.location.href = '/auth/signin'
       return
     }
 
-    fetchOrders()
+    // If we have a session, fetch orders
+    if (session) {
+      fetchOrders()
+    }
   }, [session, status, isRedirecting])
 
   const fetchOrders = async () => {

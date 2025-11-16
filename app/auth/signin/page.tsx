@@ -79,36 +79,39 @@ function SignInForm() {
             const session = await sessionResponse.json()
             
             if (session?.user?.role) {
-              // Redirect based on role
+              // Use hard redirect to break any loops and ensure session is fully loaded
               if (session.user.role === 'ADMIN') {
-                router.replace('/admin')
+                window.location.href = '/admin'
               } else {
                 // Regular users go to profile/dashboard
-                router.replace('/profile')
+                const cleanCallback = callbackUrl.split('?')[0]
+                const targetUrl = cleanCallback && cleanCallback !== '/' && cleanCallback !== '/auth/signin' && cleanCallback.startsWith('/') && !cleanCallback.startsWith('/auth/')
+                  ? cleanCallback 
+                  : '/profile'
+                window.location.href = targetUrl
               }
+              return // Exit function after redirect
             } else if (retries > 0) {
               // Retry if session not ready yet
-              await new Promise((resolve) => setTimeout(resolve, 200))
+              await new Promise((resolve) => setTimeout(resolve, 300))
               return getSessionWithRetry(retries - 1)
             } else {
-              // Fallback to default redirect
+              // Fallback to default redirect with hard redirect
               const cleanCallback = callbackUrl.split('?')[0]
-              const targetUrl = cleanCallback && cleanCallback !== '/' && cleanCallback !== '/auth/signin' && cleanCallback.startsWith('/') 
+              const targetUrl = cleanCallback && cleanCallback !== '/' && cleanCallback !== '/auth/signin' && cleanCallback.startsWith('/') && !cleanCallback.startsWith('/auth/')
                 ? cleanCallback 
                 : '/profile'
-              router.replace(targetUrl)
+              window.location.href = targetUrl
+              return
             }
           } catch (err) {
             if (retries > 0) {
-              await new Promise((resolve) => setTimeout(resolve, 200))
+              await new Promise((resolve) => setTimeout(resolve, 300))
               return getSessionWithRetry(retries - 1)
             } else {
-              // Fallback to default redirect
-              const cleanCallback = callbackUrl.split('?')[0]
-              const targetUrl = cleanCallback && cleanCallback !== '/' && cleanCallback !== '/auth/signin' && cleanCallback.startsWith('/') 
-                ? cleanCallback 
-                : '/profile'
-              router.replace(targetUrl)
+              // Fallback to default redirect with hard redirect
+              window.location.href = '/profile'
+              return
             }
           }
         }
