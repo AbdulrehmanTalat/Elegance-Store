@@ -19,7 +19,7 @@ type SignInFormData = z.infer<typeof signInSchema>
 function SignInForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') || '/profile'
+  const rawCallbackUrl = searchParams.get('callbackUrl') || '/profile'
   const { data: session, status } = useSession()
   const { showError } = useToast()
   const {
@@ -30,16 +30,39 @@ function SignInForm() {
     resolver: zodResolver(signInSchema),
   })
 
+  // Extract pathname from callbackUrl (handle both full URLs and relative paths)
+  const getCallbackPath = () => {
+    try {
+      // If it's a full URL, extract the pathname
+      if (rawCallbackUrl.startsWith('http://') || rawCallbackUrl.startsWith('https://')) {
+        const url = new URL(rawCallbackUrl)
+        return url.pathname
+      }
+      // If it's already a relative path, use it as is
+      return rawCallbackUrl
+    } catch {
+      // If URL parsing fails, default to /profile
+      return '/profile'
+    }
+  }
+
+  const callbackPath = getCallbackPath()
+
   const onSubmit = async (data: SignInFormData) => {
     try {
+      // Determine the target URL - use relative path for NextAuth
+      const targetUrl = callbackPath !== '/' && 
+                       callbackPath !== '/auth/signin' && 
+                       !callbackPath.startsWith('/auth/')
+        ? callbackPath
+        : '/profile'
+
       // Use NextAuth's built-in redirect
       await signIn('credentials', {
         email: data.email,
         password: data.password,
         redirect: true,
-        callbackUrl: callbackUrl !== '/' && callbackUrl !== '/auth/signin' && !callbackUrl.startsWith('/auth/')
-          ? callbackUrl
-          : '/profile',
+        callbackUrl: targetUrl,
       })
     } catch (error) {
       showError('An error occurred. Please try again.')
