@@ -50,6 +50,7 @@ export default function AdminOrdersPage() {
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null)
 
   useEffect(() => {
     if (status === 'loading') return
@@ -108,6 +109,7 @@ export default function AdminOrdersPage() {
   }, [searchQuery, orders])
 
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
+    setUpdatingOrderId(orderId)
     try {
       const response = await fetch(`/api/admin/orders/${orderId}`, {
         method: 'PUT',
@@ -117,9 +119,16 @@ export default function AdminOrdersPage() {
 
       if (response.ok) {
         await fetchOrders()
+        // Small delay to show success state
+        setTimeout(() => {
+          setUpdatingOrderId(null)
+        }, 500)
+      } else {
+        setUpdatingOrderId(null)
       }
     } catch (error) {
       console.error('Error updating order:', error)
+      setUpdatingOrderId(null)
     }
   }
 
@@ -191,11 +200,27 @@ export default function AdminOrdersPage() {
             </div>
 
             <div className="mb-4">
-              <p className="font-semibold">Status:</p>
+              <div className="flex items-center gap-2">
+                <p className="font-semibold">Status:</p>
+                {updatingOrderId === order.id && (
+                  <span className="text-sm text-primary-600 flex items-center gap-1">
+                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Updating & sending email...
+                  </span>
+                )}
+              </div>
               <select
                 value={order.status}
                 onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                className="mt-1 border border-gray-300 rounded-lg px-4 py-2"
+                disabled={updatingOrderId === order.id}
+                className={`mt-1 border border-gray-300 rounded-lg px-4 py-2 ${
+                  updatingOrderId === order.id 
+                    ? 'opacity-50 cursor-not-allowed bg-gray-100' 
+                    : 'cursor-pointer'
+                }`}
               >
                 <option value="PENDING">Pending</option>
                 <option value="CONFIRMED">Confirmed</option>
@@ -224,14 +249,6 @@ export default function AdminOrdersPage() {
                   } else if (item.product.image) {
                     displayImage = item.product.image
                   }
-
-                  // Build size label
-                  const sizeLabel = item.bandSize && item.cupSize
-                    ? `${item.bandSize} ${item.cupSize}`.trim()
-                    : item.variant?.size || ''
-
-                  // Build variant info (color and size)
-                  const variantInfo = [item.colorName, sizeLabel].filter(Boolean).join(' - ')
 
                   return (
                     <div key={item.id} className="flex gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
@@ -262,14 +279,31 @@ export default function AdminOrdersPage() {
                             {item.product.description}
                           </p>
                         )}
-                        {variantInfo && (
-                          <p className="text-sm text-gray-700 mb-1">
-                            <span className="font-medium">Variant:</span> {variantInfo}
+                        <div className="space-y-1 mb-2">
+                          {item.colorName && (
+                            <p className="text-sm text-gray-700">
+                              <span className="font-medium">Color:</span> {item.colorName}
+                            </p>
+                          )}
+                          {item.bandSize && (
+                            <p className="text-sm text-gray-700">
+                              <span className="font-medium">Band Size:</span> {item.bandSize}
+                            </p>
+                          )}
+                          {item.cupSize && (
+                            <p className="text-sm text-gray-700">
+                              <span className="font-medium">Cup Size:</span> {item.cupSize}
+                            </p>
+                          )}
+                          {!item.bandSize && !item.cupSize && item.variant?.size && (
+                            <p className="text-sm text-gray-700">
+                              <span className="font-medium">Size:</span> {item.variant.size}
+                            </p>
+                          )}
+                          <p className="text-sm text-gray-700">
+                            <span className="font-medium">Quantity:</span> {item.quantity}
                           </p>
-                        )}
-                        <p className="text-sm text-gray-700 mb-1">
-                          <span className="font-medium">Quantity:</span> {item.quantity}
-                        </p>
+                        </div>
                         <p className="text-lg font-bold text-primary-600 mt-2">
                           Rs {(item.price * item.quantity).toFixed(2)}
                         </p>

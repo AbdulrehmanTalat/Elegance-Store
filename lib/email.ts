@@ -93,11 +93,6 @@ export async function sendOrderConfirmationEmail(
                       <!-- Order Items -->
                       <h3 style="color: #333333; font-size: 20px; margin: 30px 0 20px 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Order Items</h3>
                       ${items.map((item) => {
-                        const sizeLabel = item.bandSize && item.cupSize 
-                          ? `${item.bandSize} ${item.cupSize}`.trim()
-                          : item.size || ''
-                        const variantInfo = [item.colorName, sizeLabel].filter(Boolean).join(' - ')
-                        
                         // Build image URL - handle both absolute and relative paths
                         let imageUrl = getEmailImageUrl('lingerie.png') // default fallback
                         if (item.image) {
@@ -121,7 +116,10 @@ export async function sendOrderConfirmationEmail(
                               </td>
                               <td style="vertical-align: top;">
                                 <p style="margin: 0 0 8px 0; color: #333333; font-size: 16px; font-weight: 600;">${item.productName}</p>
-                                ${variantInfo ? `<p style="margin: 0 0 8px 0; color: #666666; font-size: 14px;">${variantInfo}</p>` : ''}
+                                ${item.colorName ? `<p style="margin: 0 0 4px 0; color: #666666; font-size: 14px;"><strong>Color:</strong> ${item.colorName}</p>` : ''}
+                                ${item.bandSize ? `<p style="margin: 0 0 4px 0; color: #666666; font-size: 14px;"><strong>Band Size:</strong> ${item.bandSize}</p>` : ''}
+                                ${item.cupSize ? `<p style="margin: 0 0 4px 0; color: #666666; font-size: 14px;"><strong>Cup Size:</strong> ${item.cupSize}</p>` : ''}
+                                ${!item.bandSize && !item.cupSize && item.size ? `<p style="margin: 0 0 4px 0; color: #666666; font-size: 14px;"><strong>Size:</strong> ${item.size}</p>` : ''}
                                 <p style="margin: 0 0 8px 0; color: #666666; font-size: 14px;"><strong>Quantity:</strong> ${item.quantity}</p>
                                 <p style="margin: 0; color: ${STORE_COLOR}; font-size: 18px; font-weight: bold;">Rs ${(item.price * item.quantity).toFixed(2)}</p>
                               </td>
@@ -222,7 +220,6 @@ export async function sendAdminOrderNotificationEmail(
                         const sizeLabel = item.bandSize && item.cupSize 
                           ? `${item.bandSize} ${item.cupSize}`.trim()
                           : item.size || ''
-                        const variantInfo = [item.colorName, sizeLabel].filter(Boolean).join(' - ')
                         
                         // Build image URL - handle both absolute and relative paths
                         let imageUrl = getEmailImageUrl('lingerie.png') // default fallback
@@ -247,7 +244,8 @@ export async function sendAdminOrderNotificationEmail(
                               </td>
                               <td style="vertical-align: top;">
                                 <p style="margin: 0 0 6px 0; color: #333333; font-size: 15px; font-weight: 600;">${item.productName}</p>
-                                ${variantInfo ? `<p style="margin: 0 0 6px 0; color: #666666; font-size: 13px;">${variantInfo}</p>` : ''}
+                                ${item.colorName ? `<p style="margin: 0 0 3px 0; color: #666666; font-size: 13px;"><strong>Color:</strong> ${item.colorName}</p>` : ''}
+                                ${sizeLabel ? `<p style="margin: 0 0 3px 0; color: #666666; font-size: 13px;"><strong>Size:</strong> ${sizeLabel}</p>` : ''}
                                 <p style="margin: 0 0 6px 0; color: #666666; font-size: 13px;"><strong>Quantity:</strong> ${item.quantity}</p>
                                 <p style="margin: 0; color: #10b981; font-size: 16px; font-weight: bold;">Rs ${(item.price * item.quantity).toFixed(2)}</p>
                               </td>
@@ -356,11 +354,6 @@ export async function sendOrderStatusUpdateEmail(
                       <!-- Order Items -->
                       <h3 style="color: #333333; font-size: 20px; margin: 30px 0 20px 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Order Items</h3>
                       ${items.map((item) => {
-                        const sizeLabel = item.bandSize && item.cupSize 
-                          ? `${item.bandSize} ${item.cupSize}`.trim()
-                          : item.size || ''
-                        const variantInfo = [item.colorName, sizeLabel].filter(Boolean).join(' - ')
-                        
                         // Build image URL - handle both absolute and relative paths
                         let imageUrl = getEmailImageUrl('lingerie.png') // default fallback
                         if (item.image) {
@@ -384,7 +377,10 @@ export async function sendOrderStatusUpdateEmail(
                               </td>
                               <td style="vertical-align: top;">
                                 <p style="margin: 0 0 8px 0; color: #333333; font-size: 16px; font-weight: 600;">${item.productName}</p>
-                                ${variantInfo ? `<p style="margin: 0 0 8px 0; color: #666666; font-size: 14px;">${variantInfo}</p>` : ''}
+                                ${item.colorName ? `<p style="margin: 0 0 4px 0; color: #666666; font-size: 14px;"><strong>Color:</strong> ${item.colorName}</p>` : ''}
+                                ${item.bandSize ? `<p style="margin: 0 0 4px 0; color: #666666; font-size: 14px;"><strong>Band Size:</strong> ${item.bandSize}</p>` : ''}
+                                ${item.cupSize ? `<p style="margin: 0 0 4px 0; color: #666666; font-size: 14px;"><strong>Cup Size:</strong> ${item.cupSize}</p>` : ''}
+                                ${!item.bandSize && !item.cupSize && item.size ? `<p style="margin: 0 0 4px 0; color: #666666; font-size: 14px;"><strong>Size:</strong> ${item.size}</p>` : ''}
                                 <p style="margin: 0 0 8px 0; color: #666666; font-size: 14px;"><strong>Quantity:</strong> ${item.quantity}</p>
                                 <p style="margin: 0; color: ${STORE_COLOR}; font-size: 18px; font-weight: bold;">Rs ${(item.price * item.quantity).toFixed(2)}</p>
                               </td>

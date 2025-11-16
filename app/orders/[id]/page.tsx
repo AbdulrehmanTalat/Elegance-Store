@@ -131,13 +131,28 @@ export default async function OrderPage({
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold">{item.product.name}</h3>
-                {(item.colorName || item.bandSize || item.cupSize) && (
-                  <p className="text-sm text-gray-600 mb-1">
-                    {item.colorName && `Color: ${item.colorName}`}
-                    {item.bandSize && ` | Band: ${item.bandSize}`}
-                    {item.cupSize && ` | Cup: ${item.cupSize}`}
-                  </p>
-                )}
+                <div className="space-y-1 mb-2">
+                  {item.colorName && (
+                    <p className="text-sm text-gray-600">
+                      <span className="font-medium">Color:</span> {item.colorName}
+                    </p>
+                  )}
+                  {item.bandSize && (
+                    <p className="text-sm text-gray-600">
+                      <span className="font-medium">Band Size:</span> {item.bandSize}
+                    </p>
+                  )}
+                  {item.cupSize && (
+                    <p className="text-sm text-gray-600">
+                      <span className="font-medium">Cup Size:</span> {item.cupSize}
+                    </p>
+                  )}
+                  {!item.bandSize && !item.cupSize && item.variant?.size && (
+                    <p className="text-sm text-gray-600">
+                      <span className="font-medium">Size:</span> {item.variant.size}
+                    </p>
+                  )}
+                </div>
                 <p className="text-gray-600">Quantity: {item.quantity}</p>
                 <p className="text-lg font-bold text-primary-600">
                   Rs {(item.price * item.quantity).toFixed(2)}

@@ -85,9 +85,9 @@ export default function CheckoutPage() {
           window.location.href = result.paymentUrl
         }
       } else {
-        // COD - order created, clear cart and redirect
+        // COD - order created, clear cart and redirect immediately to order confirmation
         clearCart()
-        router.push(`/orders/${result.orderId}`)
+        window.location.href = `/orders/${result.orderId}`
       }
     } catch (error) {
       console.error('Checkout error:', error)
