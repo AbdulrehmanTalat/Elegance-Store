@@ -53,31 +53,34 @@ export default withAuth(
   {
     callbacks: {
       authorized: ({ token, req }) => {
+        const pathname = req.nextUrl.pathname
+        
         // Allow access to public routes
-        if (req.nextUrl.pathname.startsWith('/api/auth')) {
+        if (pathname.startsWith('/api/auth')) {
           return true
         }
 
         // Allow access to sign-in page (we handle redirect in middleware function)
-        if (req.nextUrl.pathname.startsWith('/auth/signin')) {
+        if (pathname.startsWith('/auth/signin')) {
           return true
         }
 
         // Protect admin routes
-        if (req.nextUrl.pathname.startsWith('/admin')) {
-          // Return true if admin, false otherwise (NextAuth will redirect)
+        if (pathname.startsWith('/admin')) {
           return token?.role === 'ADMIN' ? true : false
         }
 
         // Protect checkout and profile routes
         if (
-          req.nextUrl.pathname.startsWith('/checkout') ||
-          req.nextUrl.pathname.startsWith('/profile') ||
-          req.nextUrl.pathname.startsWith('/orders')
+          pathname.startsWith('/checkout') ||
+          pathname.startsWith('/profile') ||
+          pathname.startsWith('/orders')
         ) {
-          // If token exists (even if just an empty object), allow access
-          // Only block if token is null or undefined
-          return token !== null && token !== undefined
+          // CRITICAL: If token exists at all, allow access
+          // This prevents redirect loops after sign-in
+          // token can be an object even if role is missing temporarily
+          const hasToken = token !== null && token !== undefined
+          return hasToken
         }
 
         return true
