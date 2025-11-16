@@ -134,16 +134,19 @@ function SignInForm() {
     )
   }
 
-  // If authenticated, middleware should have redirected already
-  // But if we're still here, show a simple message (shouldn't happen)
+  // If authenticated, layout should have redirected, but as fallback:
   if (session?.user) {
+    // Use meta refresh as absolute last resort
     return (
-      <div className="container mx-auto px-4 py-16">
-        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
-          <h1 className="text-3xl font-bold text-center mb-8">Sign In</h1>
-          <div className="text-center">You are already signed in. Redirecting...</div>
+      <>
+        <meta httpEquiv="refresh" content="0;url=/profile" />
+        <div className="container mx-auto px-4 py-16">
+          <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
+            <h1 className="text-3xl font-bold text-center mb-8">Sign In</h1>
+            <div className="text-center">Redirecting...</div>
+          </div>
         </div>
-      </div>
+      </>
     )
   }
 
