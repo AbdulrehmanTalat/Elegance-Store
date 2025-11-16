@@ -50,43 +50,32 @@ function SignInForm() {
     resolver: zodResolver(signInSchema),
   })
 
-  // Redirect if already authenticated (only once)
+  // Redirect if already authenticated - use hard redirect to break any loops
   useEffect(() => {
     if (status === 'loading' || isRedirecting) return
 
     if (session?.user) {
       setIsRedirecting(true)
-      // If user is already signed in, redirect based on role
+      // Use hard redirect to break any loops - middleware should handle this, but as fallback
       if (session.user.role === 'ADMIN') {
-        // Use router.replace to avoid adding to history and prevent loops
-        const currentPath = window.location.pathname
-        if (currentPath !== '/admin') {
-          router.replace('/admin')
-        }
+        window.location.href = '/admin'
       } else {
         // For regular users, use callbackUrl if provided, otherwise go to profile
-        // Avoid redirecting to sign-in page or current page
-        const currentPath = window.location.pathname
-        let targetUrl = '/profile'
-        
-        // Clean callbackUrl - remove query params and ensure it's a valid path
         const cleanCallback = callbackUrl.split('?')[0]
+        let targetUrl = '/profile'
         
         if (cleanCallback && 
             cleanCallback !== '/' && 
             cleanCallback !== '/auth/signin' && 
             !cleanCallback.startsWith('/auth/') &&
-            cleanCallback !== currentPath &&
             cleanCallback.startsWith('/')) {
           targetUrl = cleanCallback
         }
         
-        if (currentPath !== targetUrl && targetUrl !== '/auth/signin') {
-          router.replace(targetUrl)
-        }
+        window.location.href = targetUrl
       }
     }
-  }, [session, status, callbackUrl, router, isRedirecting])
+  }, [session, status, callbackUrl, isRedirecting])
 
   const onSubmit = async (data: SignInFormData) => {
     setLoading(true)

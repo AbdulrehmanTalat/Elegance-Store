@@ -50,15 +50,13 @@ export default function AdminPage() {
     if (status === 'loading') return
 
     if (!session || session.user.role !== 'ADMIN') {
-      // Only redirect if we're not already on the home page
-      if (window.location.pathname !== '/') {
-        router.replace('/')
-      }
+      // Use hard redirect to break any loops
+      window.location.href = '/'
       return
     }
 
     fetchProducts()
-  }, [session, status, router])
+  }, [session, status])
 
   const fetchProducts = async () => {
     try {

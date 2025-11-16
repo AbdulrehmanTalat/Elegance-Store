@@ -39,15 +39,13 @@ export default function ProfilePage() {
 
     if (!session) {
       setIsRedirecting(true)
-      // Only redirect if we're not already on the sign-in page
-      if (window.location.pathname !== '/auth/signin') {
-        router.replace('/auth/signin')
-      }
+      // Use hard redirect to break any loops
+      window.location.href = '/auth/signin'
       return
     }
 
     fetchOrders()
-  }, [session, status, router, isRedirecting])
+  }, [session, status, isRedirecting])
 
   const fetchOrders = async () => {
     try {
