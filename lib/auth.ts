@@ -98,16 +98,20 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async jwt({ token, user }) {
-      // ALWAYS force token expiration to 30 days from now, regardless of existing value
-      // This fixes tokens created with old code that had 1-year expiration
       const thirtyDaysInSeconds = 30 * 24 * 60 * 60
       const now = Math.floor(Date.now() / 1000)
-      token.exp = now + thirtyDaysInSeconds
       
       if (user) {
+        // New token creation - set expiration to 30 days from now
         token.role = (user as any).role
         token.id = user.id
+        token.exp = now + thirtyDaysInSeconds
+      } else if (!token.exp || token.exp > now + (60 * 24 * 60 * 60)) {
+        // Existing token - fix expiration if it's wrong (more than 60 days)
+        // This fixes tokens created with old code that had 1-year expiration
+        token.exp = now + thirtyDaysInSeconds
       }
+      // If token.exp exists and is reasonable (30-60 days), keep it as is
       return token
     },
     async session({ session, token }) {
