@@ -98,22 +98,15 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async jwt({ token, user }) {
+      // ALWAYS force token expiration to 30 days from now, regardless of existing value
+      // This fixes tokens created with old code that had 1-year expiration
       const thirtyDaysInSeconds = 30 * 24 * 60 * 60
       const now = Math.floor(Date.now() / 1000)
-      const correctExp = now + thirtyDaysInSeconds
+      token.exp = now + thirtyDaysInSeconds
       
       if (user) {
         token.role = (user as any).role
         token.id = user.id
-        // Always set token expiration to 30 days from now for new sign-ins
-        token.exp = correctExp
-      } else {
-        // For existing tokens, always recalculate to ensure 30-day expiration
-        // This fixes tokens created with old code that had 1-year expiration
-        if (!token.exp || token.exp > now + (60 * 24 * 60 * 60)) {
-          // If exp is missing or more than 60 days, recalculate to 30 days
-          token.exp = correctExp
-        }
       }
       return token
     },
@@ -122,11 +115,15 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string
         session.user.role = token.role as string
       }
-      // ALWAYS set session expiration to exactly 30 days from now
-      // This overrides any incorrect token.exp values
-      const thirtyDaysFromNow = new Date()
-      thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
-      session.expires = thirtyDaysFromNow.toISOString()
+      // Use token.exp (which we force to 30 days in jwt callback) to set session expiration
+      if (token.exp) {
+        session.expires = new Date(token.exp * 1000).toISOString()
+      } else {
+        // Fallback: calculate 30 days from now
+        const thirtyDaysFromNow = new Date()
+        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
+        session.expires = thirtyDaysFromNow.toISOString()
+      }
       return session
     },
     async redirect({ url, baseUrl }) {
