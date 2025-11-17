@@ -17,7 +17,8 @@ export async function GET(req: NextRequest) {
 
     const tokenExp = typeof token.exp === 'number' ? token.exp : null
     const now = Math.floor(Date.now() / 1000)
-    const daysFromNow = tokenExp ? Math.floor((tokenExp - now) / (24 * 60 * 60)) : null
+    const hoursFromNow = tokenExp ? Math.floor((tokenExp - now) / (60 * 60)) : null
+    const minutesFromNow = tokenExp ? Math.floor(((tokenExp - now) % (60 * 60)) / 60) : null
 
     return NextResponse.json({
       token: {
@@ -26,7 +27,8 @@ export async function GET(req: NextRequest) {
         role: token.role,
         exp: tokenExp,
         expDate: tokenExp ? new Date(tokenExp * 1000).toISOString() : null,
-        daysFromNow: daysFromNow,
+        hoursFromNow: hoursFromNow,
+        minutesFromNow: minutesFromNow,
         iat: token.iat,
         iatDate: token.iat ? new Date((token.iat as number) * 1000).toISOString() : null,
       },
