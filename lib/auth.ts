@@ -97,7 +97,7 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30 days - JWT token expires after 30 days
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       const thirtyDaysInSeconds = 30 * 24 * 60 * 60
       const now = Math.floor(Date.now() / 1000)
       
@@ -106,43 +106,37 @@ export const authOptions: NextAuthOptions = {
         token.role = (user as any).role
         token.id = user.id
         token.exp = now + thirtyDaysInSeconds
-        console.log('JWT: New token created, exp set to:', new Date((token.exp as number) * 1000).toISOString())
+        console.log('JWT: New token created, exp set to:', new Date(token.exp * 1000).toISOString())
       } else {
-        // For existing tokens, ALWAYS recalculate expiration to ensure it's 30 days
-        // This fixes tokens created with old code that had 1-year expiration
+        // For existing tokens, check and fix expiration
         const currentExp = typeof token.exp === 'number' ? token.exp : 0
-        const expectedExp = now + thirtyDaysInSeconds
+        const daysFromNow = currentExp > 0 ? Math.floor((currentExp - now) / (24 * 60 * 60)) : 0
         
-        // ALWAYS fix the expiration if it's more than 60 days (catches 1-year tokens)
+        // If expiration is more than 60 days (catches 1-year tokens), fix it
         if (!token.exp || currentExp > now + (60 * 24 * 60 * 60)) {
-          // Token exp is missing or wrong (more than 60 days) - fix it
-          token.exp = expectedExp
-          console.log('JWT: Fixed token exp from', currentExp ? new Date(currentExp * 1000).toISOString() : 'missing', 'to', new Date(expectedExp * 1000).toISOString())
+          token.exp = now + thirtyDaysInSeconds
+          console.log('JWT: Fixed token exp from', currentExp ? `${daysFromNow} days` : 'missing', 'to 30 days')
         } else {
-          console.log('JWT: Token exp is correct:', new Date(currentExp * 1000).toISOString(), 'Days from now:', Math.floor((currentExp - now) / (24 * 60 * 60)))
+          console.log('JWT: Token exp is correct:', daysFromNow, 'days from now')
         }
       }
+      
+      // Ensure token.exp is always set correctly
+      if (!token.exp || (typeof token.exp === 'number' && token.exp > now + (60 * 24 * 60 * 60))) {
+        token.exp = now + thirtyDaysInSeconds
+      }
+      
       return token
     },
     async session({ session, token }) {
-      console.log('=== SESSION CALLBACK START ===')
-      console.log('Session input expires:', session.expires)
-      console.log('Token exp value:', token.exp, 'Type:', typeof token.exp)
-      console.log('Token exp as date:', token.exp && typeof token.exp === 'number' ? new Date(token.exp * 1000).toISOString() : 'N/A')
-      
       if (session.user) {
         session.user.id = token.id as string
         session.user.role = token.role as string
       }
       
-      // ALWAYS force session expiration to 30 days from now
-      // This overrides any value that NextAuth might have set
-      const thirtyDaysFromNow = new Date()
-      thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
-      session.expires = thirtyDaysFromNow.toISOString()
-      
-      console.log('Session output expires:', session.expires)
-      console.log('=== SESSION CALLBACK END ===')
+      // NextAuth calculates session.expires from token.exp automatically
+      // We just need to ensure token.exp is correct (which we do in jwt callback)
+      // Don't manually set session.expires - let NextAuth handle it
       
       return session
     },
@@ -183,4 +177,5 @@ export const authOptions: NextAuthOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET,
 }
+
 
