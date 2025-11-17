@@ -124,22 +124,25 @@ export const authOptions: NextAuthOptions = {
       return token
     },
     async session({ session, token }) {
+      console.log('=== SESSION CALLBACK START ===')
+      console.log('Session input expires:', session.expires)
+      console.log('Token exp value:', token.exp, 'Type:', typeof token.exp)
+      console.log('Token exp as date:', token.exp && typeof token.exp === 'number' ? new Date(token.exp * 1000).toISOString() : 'N/A')
+      
       if (session.user) {
         session.user.id = token.id as string
         session.user.role = token.role as string
       }
       
-      // Use token.exp to set session expiration
-      if (token.exp && typeof token.exp === 'number') {
-        session.expires = new Date(token.exp * 1000).toISOString()
-        console.log('Session: Using token.exp:', token.exp, '-> expires:', session.expires)
-      } else {
-        // Fallback: calculate 30 days from now
-        const thirtyDaysFromNow = new Date()
-        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
-        session.expires = thirtyDaysFromNow.toISOString()
-        console.log('Session: token.exp missing, using fallback:', session.expires)
-      }
+      // ALWAYS force session expiration to 30 days from now
+      // This overrides any value that NextAuth might have set
+      const thirtyDaysFromNow = new Date()
+      thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
+      session.expires = thirtyDaysFromNow.toISOString()
+      
+      console.log('Session output expires:', session.expires)
+      console.log('=== SESSION CALLBACK END ===')
+      
       return session
     },
     async redirect({ url, baseUrl }) {
