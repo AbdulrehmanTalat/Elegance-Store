@@ -90,40 +90,40 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-    updateAge: 24 * 60 * 60, // 24 hours - session is updated every 24 hours
+    maxAge: 4 * 60 * 60, // 4 hours
+    updateAge: 60 * 60, // 1 hour - session is updated every hour
   },
   jwt: {
-    maxAge: 30 * 24 * 60 * 60, // 30 days - JWT token expires after 30 days
+    maxAge: 4 * 60 * 60, // 4 hours - JWT token expires after 4 hours
   },
   callbacks: {
     async jwt({ token, user, trigger }) {
-      const thirtyDaysInSeconds = 30 * 24 * 60 * 60
+      const fourHoursInSeconds = 4 * 60 * 60
       const now = Math.floor(Date.now() / 1000)
       
       if (user) {
-        // New token creation - set expiration to 30 days from now
+        // New token creation - set expiration to 4 hours from now
         token.role = (user as any).role
         token.id = user.id
-        token.exp = now + thirtyDaysInSeconds
+        token.exp = now + fourHoursInSeconds
         console.log('JWT: New token created, exp set to:', new Date((token.exp as number) * 1000).toISOString())
       } else {
         // For existing tokens, check and fix expiration
         const currentExp = typeof token.exp === 'number' ? token.exp : 0
-        const daysFromNow = currentExp > 0 ? Math.floor((currentExp - now) / (24 * 60 * 60)) : 0
+        const hoursFromNow = currentExp > 0 ? Math.floor((currentExp - now) / (60 * 60)) : 0
         
-        // If expiration is more than 60 days (catches 1-year tokens), fix it
-        if (!token.exp || currentExp > now + (60 * 24 * 60 * 60)) {
-          token.exp = now + thirtyDaysInSeconds
-          console.log('JWT: Fixed token exp from', currentExp ? `${daysFromNow} days` : 'missing', 'to 30 days')
+        // If expiration is more than 8 hours (catches old long-lived tokens), fix it
+        if (!token.exp || currentExp > now + (8 * 60 * 60)) {
+          token.exp = now + fourHoursInSeconds
+          console.log('JWT: Fixed token exp from', currentExp ? `${hoursFromNow} hours` : 'missing', 'to 4 hours')
         } else {
-          console.log('JWT: Token exp is correct:', daysFromNow, 'days from now')
+          console.log('JWT: Token exp is correct:', hoursFromNow, 'hours from now')
         }
       }
       
       // Ensure token.exp is always set correctly
-      if (!token.exp || (typeof token.exp === 'number' && token.exp > now + (60 * 24 * 60 * 60))) {
-        token.exp = now + thirtyDaysInSeconds
+      if (!token.exp || (typeof token.exp === 'number' && token.exp > now + (8 * 60 * 60))) {
+        token.exp = now + fourHoursInSeconds
       }
       
       return token
@@ -139,10 +139,10 @@ export const authOptions: NextAuthOptions = {
       if (token.exp && typeof token.exp === 'number') {
         session.expires = new Date(token.exp * 1000).toISOString()
       } else {
-        // Fallback: calculate from maxAge if token.exp is missing
-        const thirtyDaysFromNow = new Date()
-        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
-        session.expires = thirtyDaysFromNow.toISOString()
+        // Fallback: calculate 4 hours from now if token.exp is missing
+        const fourHoursFromNow = new Date()
+        fourHoursFromNow.setHours(fourHoursFromNow.getHours() + 4)
+        session.expires = fourHoursFromNow.toISOString()
       }
       
       return session
