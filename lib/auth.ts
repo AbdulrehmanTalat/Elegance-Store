@@ -106,7 +106,7 @@ export const authOptions: NextAuthOptions = {
         token.role = (user as any).role
         token.id = user.id
         token.exp = now + thirtyDaysInSeconds
-      } else if (!token.exp || token.exp > now + (60 * 24 * 60 * 60)) {
+      } else if (!token.exp || (typeof token.exp === 'number' && token.exp > now + (60 * 24 * 60 * 60))) {
         // Existing token - fix expiration if it's wrong (more than 60 days)
         // This fixes tokens created with old code that had 1-year expiration
         token.exp = now + thirtyDaysInSeconds
