@@ -106,12 +106,21 @@ export const authOptions: NextAuthOptions = {
         token.role = (user as any).role
         token.id = user.id
         token.exp = now + thirtyDaysInSeconds
-      } else if (!token.exp || (typeof token.exp === 'number' && token.exp > now + (60 * 24 * 60 * 60))) {
-        // Existing token - fix expiration if it's wrong (more than 60 days)
+        console.log('JWT: New token created, exp set to:', new Date(token.exp * 1000).toISOString())
+      } else {
+        // For existing tokens, ALWAYS recalculate expiration to ensure it's 30 days
         // This fixes tokens created with old code that had 1-year expiration
-        token.exp = now + thirtyDaysInSeconds
+        const currentExp = typeof token.exp === 'number' ? token.exp : 0
+        const expectedExp = now + thirtyDaysInSeconds
+        
+        if (!token.exp || currentExp > now + (60 * 24 * 60 * 60)) {
+          // Token exp is missing or wrong (more than 60 days) - fix it
+          token.exp = expectedExp
+          console.log('JWT: Fixed token exp from', currentExp ? new Date(currentExp * 1000).toISOString() : 'missing', 'to', new Date(expectedExp * 1000).toISOString())
+        } else {
+          console.log('JWT: Token exp is correct:', new Date(currentExp * 1000).toISOString())
+        }
       }
-      // If token.exp exists and is reasonable (30-60 days), keep it as is
       return token
     },
     async session({ session, token }) {
@@ -119,14 +128,17 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string
         session.user.role = token.role as string
       }
-      // Use token.exp (which we force to 30 days in jwt callback) to set session expiration
+      
+      // Use token.exp to set session expiration
       if (token.exp && typeof token.exp === 'number') {
         session.expires = new Date(token.exp * 1000).toISOString()
+        console.log('Session: Using token.exp:', token.exp, '-> expires:', session.expires)
       } else {
         // Fallback: calculate 30 days from now
         const thirtyDaysFromNow = new Date()
         thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
         session.expires = thirtyDaysFromNow.toISOString()
+        console.log('Session: token.exp missing, using fallback:', session.expires)
       }
       return session
     },
