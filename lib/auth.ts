@@ -101,7 +101,15 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.role = (user as any).role
         token.id = user.id
-        // Don't manually set token.exp - NextAuth calculates it automatically from jwt.maxAge
+        // Explicitly set token expiration to 30 days from now (in seconds since epoch)
+        // This ensures the JWT expires correctly regardless of NextAuth defaults
+        const thirtyDaysInSeconds = 30 * 24 * 60 * 60
+        token.exp = Math.floor(Date.now() / 1000) + thirtyDaysInSeconds
+      }
+      // If token already exists but exp is missing or wrong, update it
+      if (!token.exp || token.exp > Math.floor(Date.now() / 1000) + (365 * 24 * 60 * 60)) {
+        const thirtyDaysInSeconds = 30 * 24 * 60 * 60
+        token.exp = Math.floor(Date.now() / 1000) + thirtyDaysInSeconds
       }
       return token
     },
@@ -110,13 +118,12 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string
         session.user.role = token.role as string
       }
-      // Explicitly set session expiration to 30 days from now
-      // This ensures the expires date is calculated correctly
+      // Explicitly set session expiration based on token.exp
+      // Convert JWT exp (seconds since epoch) to ISO string
       if (token.exp) {
-        // Convert JWT exp (seconds since epoch) to ISO string
         session.expires = new Date(token.exp * 1000).toISOString()
       } else {
-        // Fallback: calculate 30 days from now if token.exp is not set
+        // Fallback: calculate 30 days from now
         const thirtyDaysFromNow = new Date()
         thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
         session.expires = thirtyDaysFromNow.toISOString()
