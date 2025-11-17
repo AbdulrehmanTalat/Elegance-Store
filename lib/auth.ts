@@ -110,6 +110,17 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string
         session.user.role = token.role as string
       }
+      // Explicitly set session expiration to 30 days from now
+      // This ensures the expires date is calculated correctly
+      if (token.exp) {
+        // Convert JWT exp (seconds since epoch) to ISO string
+        session.expires = new Date(token.exp * 1000).toISOString()
+      } else {
+        // Fallback: calculate 30 days from now if token.exp is not set
+        const thirtyDaysFromNow = new Date()
+        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
+        session.expires = thirtyDaysFromNow.toISOString()
+      }
       return session
     },
     async redirect({ url, baseUrl }) {
