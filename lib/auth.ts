@@ -134,9 +134,16 @@ export const authOptions: NextAuthOptions = {
         session.user.role = token.role as string
       }
       
-      // NextAuth calculates session.expires from token.exp automatically
-      // We just need to ensure token.exp is correct (which we do in jwt callback)
-      // Don't manually set session.expires - let NextAuth handle it
+      // Explicitly set session.expires from token.exp
+      // NextAuth doesn't always use token.exp correctly, so we force it
+      if (token.exp && typeof token.exp === 'number') {
+        session.expires = new Date(token.exp * 1000).toISOString()
+      } else {
+        // Fallback: calculate from maxAge if token.exp is missing
+        const thirtyDaysFromNow = new Date()
+        thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30)
+        session.expires = thirtyDaysFromNow.toISOString()
+      }
       
       return session
     },
