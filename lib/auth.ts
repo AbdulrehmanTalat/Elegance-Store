@@ -106,7 +106,7 @@ export const authOptions: NextAuthOptions = {
         token.role = (user as any).role
         token.id = user.id
         token.exp = now + thirtyDaysInSeconds
-        console.log('JWT: New token created, exp set to:', new Date(token.exp * 1000).toISOString())
+        console.log('JWT: New token created, exp set to:', new Date((token.exp as number) * 1000).toISOString())
       } else {
         // For existing tokens, check and fix expiration
         const currentExp = typeof token.exp === 'number' ? token.exp : 0
