@@ -116,7 +116,7 @@ export const authOptions: NextAuthOptions = {
         session.user.role = token.role as string
       }
       // Use token.exp (which we force to 30 days in jwt callback) to set session expiration
-      if (token.exp) {
+      if (token.exp && typeof token.exp === 'number') {
         session.expires = new Date(token.exp * 1000).toISOString()
       } else {
         // Fallback: calculate 30 days from now
