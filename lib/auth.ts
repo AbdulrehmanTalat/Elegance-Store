@@ -106,7 +106,7 @@ export const authOptions: NextAuthOptions = {
         token.role = (user as any).role
         token.id = user.id
         token.exp = now + thirtyDaysInSeconds
-        console.log('JWT: New token created, exp set to:', new Date(token.exp * 1000).toISOString())
+        console.log('JWT: New token created, exp set to:', new Date((token.exp as number) * 1000).toISOString())
       } else {
         // For existing tokens, ALWAYS recalculate expiration to ensure it's 30 days
         // This fixes tokens created with old code that had 1-year expiration
