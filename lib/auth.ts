@@ -113,12 +113,13 @@ export const authOptions: NextAuthOptions = {
         const currentExp = typeof token.exp === 'number' ? token.exp : 0
         const expectedExp = now + thirtyDaysInSeconds
         
+        // ALWAYS fix the expiration if it's more than 60 days (catches 1-year tokens)
         if (!token.exp || currentExp > now + (60 * 24 * 60 * 60)) {
           // Token exp is missing or wrong (more than 60 days) - fix it
           token.exp = expectedExp
           console.log('JWT: Fixed token exp from', currentExp ? new Date(currentExp * 1000).toISOString() : 'missing', 'to', new Date(expectedExp * 1000).toISOString())
         } else {
-          console.log('JWT: Token exp is correct:', new Date(currentExp * 1000).toISOString())
+          console.log('JWT: Token exp is correct:', new Date(currentExp * 1000).toISOString(), 'Days from now:', Math.floor((currentExp - now) / (24 * 60 * 60)))
         }
       }
       return token
