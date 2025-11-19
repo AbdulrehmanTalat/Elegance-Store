@@ -32,6 +32,15 @@ export default function CheckoutPage() {
   const clearCart = useCartStore((state) => state.clearCart)
   const [loading, setLoading] = useState(false)
 
+  // ALL HOOKS MUST BE CALLED BEFORE ANY CONDITIONAL RETURNS
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<CheckoutFormData>({
+    resolver: zodResolver(checkoutSchema),
+  })
+
   // Show loading while checking session
   if (status === 'loading') {
     return (
@@ -58,14 +67,6 @@ export default function CheckoutPage() {
       </div>
     )
   }
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<CheckoutFormData>({
-    resolver: zodResolver(checkoutSchema),
-  })
 
   const onSubmit = async (data: CheckoutFormData) => {
     if (!session) {
@@ -122,20 +123,6 @@ export default function CheckoutPage() {
     } finally {
       setLoading(false)
     }
-  }
-
-  if (!session) {
-    return (
-      <div className="container mx-auto px-4 py-16 text-center">
-        <p className="text-xl mb-4">Please sign in to checkout</p>
-        <button
-          onClick={() => router.push('/auth/signin?callbackUrl=/checkout')}
-          className="bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition"
-        >
-          Sign In
-        </button>
-      </div>
-    )
   }
 
   if (items.length === 0) {
