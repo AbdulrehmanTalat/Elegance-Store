@@ -48,18 +48,12 @@ function SignInForm() {
 
   const callbackPath = getCallbackPath()
 
-  // Redirect authenticated users away from sign-in page
-  if (status === 'authenticated' && session) {
-    const targetPath = session.user?.role === 'ADMIN' ? '/admin' : '/profile'
-    
-    // Use window.location for more reliable redirect
-    if (typeof window !== 'undefined') {
-      window.location.href = targetPath
-    }
-    
+  // Let middleware handle redirects - don't redirect here to avoid loops
+  // Just show loading while session is being processed
+  if (status === 'loading') {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
-        <p className="text-xl">Redirecting...</p>
+        <p className="text-xl">Loading...</p>
       </div>
     )
   }
@@ -73,13 +67,20 @@ function SignInForm() {
         ? callbackPath
         : '/profile'
 
-      // Use NextAuth's built-in redirect
-      await signIn('credentials', {
+      // Use NextAuth's built-in redirect - this will handle the redirect properly
+      const result = await signIn('credentials', {
         email: data.email,
         password: data.password,
-        redirect: true,
+        redirect: false, // Handle redirect manually to avoid conflicts
         callbackUrl: targetUrl,
       })
+
+      if (result?.error) {
+        showError('Invalid email or password')
+      } else if (result?.ok) {
+        // Let NextAuth handle the redirect
+        window.location.href = targetUrl
+      }
     } catch (error) {
       showError('An error occurred. Please try again.')
     }
