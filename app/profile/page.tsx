@@ -38,12 +38,6 @@ export default function ProfilePage() {
       return
     }
 
-    // If no session, redirect to sign-in
-    if (status === 'unauthenticated' || !session) {
-      window.location.href = '/auth/signin?callbackUrl=/profile'
-      return
-    }
-
     // If we have a session, fetch orders
     if (session) {
       fetchOrders()
@@ -110,11 +104,20 @@ export default function ProfilePage() {
     )
   }
 
-  // If no session after loading is complete, show message (middleware should handle redirect)
+  // If no session after loading is complete, show sign-in prompt
   if (status === 'unauthenticated' || !session) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
-        <p className="text-xl">Please sign in to view your profile.</p>
+        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
+          <h2 className="text-2xl font-bold mb-4">Sign In Required</h2>
+          <p className="text-gray-600 mb-6">Please sign in to view your profile.</p>
+          <button
+            onClick={() => router.push('/auth/signin?callbackUrl=/profile')}
+            className="w-full bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition"
+          >
+            Sign In
+          </button>
+        </div>
       </div>
     )
   }

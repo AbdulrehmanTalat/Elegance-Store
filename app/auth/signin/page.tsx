@@ -52,9 +52,9 @@ function SignInForm() {
   useEffect(() => {
     if (status === 'authenticated' && session) {
       const targetPath = session.user?.role === 'ADMIN' ? '/admin' : '/profile'
-      window.location.href = targetPath
+      router.push(targetPath)
     }
-  }, [status, session])
+  }, [status, session, router])
 
   // Show loading while session is being processed
   if (status === 'loading') {

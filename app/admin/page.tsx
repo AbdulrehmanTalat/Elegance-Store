@@ -49,18 +49,6 @@ export default function AdminPage() {
   useEffect(() => {
     if (status === 'loading') return
 
-    // If no session, redirect to sign-in
-    if (status === 'unauthenticated' || !session) {
-      window.location.href = '/auth/signin?callbackUrl=/admin'
-      return
-    }
-
-    // If not admin, redirect to home
-    if (session.user?.role !== 'ADMIN') {
-      window.location.href = '/'
-      return
-    }
-
     // If we have an admin session, fetch products
     if (session && session.user.role === 'ADMIN') {
       fetchProducts()
@@ -220,11 +208,38 @@ export default function AdminPage() {
     )
   }
 
-  // If no session or not admin after loading is complete, show message (middleware should handle redirect)
-  if (status === 'unauthenticated' || !session || session.user?.role !== 'ADMIN') {
+  // If no session, show sign-in prompt
+  if (status === 'unauthenticated' || !session) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
-        <p className="text-xl">Access denied. Admin privileges required.</p>
+        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
+          <h2 className="text-2xl font-bold mb-4">Sign In Required</h2>
+          <p className="text-gray-600 mb-6">Please sign in to access the admin panel.</p>
+          <button
+            onClick={() => router.push('/auth/signin?callbackUrl=/admin')}
+            className="w-full bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition"
+          >
+            Sign In
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // If not admin, show access denied
+  if (session.user?.role !== 'ADMIN') {
+    return (
+      <div className="container mx-auto px-4 py-16 text-center">
+        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
+          <h2 className="text-2xl font-bold mb-4">Access Denied</h2>
+          <p className="text-gray-600 mb-6">Admin privileges required.</p>
+          <button
+            onClick={() => router.push('/')}
+            className="w-full bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition"
+          >
+            Go Home
+          </button>
+        </div>
       </div>
     )
   }
