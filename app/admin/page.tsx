@@ -206,7 +206,16 @@ export default function AdminPage() {
   if (status === 'loading' || loading) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
-        <p>Loading...</p>
+        <p className="text-xl">Loading...</p>
+      </div>
+    )
+  }
+
+  // If no session or not admin after loading is complete, show message (middleware should handle redirect)
+  if (status === 'unauthenticated' || !session || session.user?.role !== 'ADMIN') {
+    return (
+      <div className="container mx-auto px-4 py-16 text-center">
+        <p className="text-xl">Access denied. Admin privileges required.</p>
       </div>
     )
   }

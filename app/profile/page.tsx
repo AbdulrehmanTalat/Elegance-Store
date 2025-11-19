@@ -102,7 +102,16 @@ export default function ProfilePage() {
   if (status === 'loading' || loading) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
-        <p>Loading...</p>
+        <p className="text-xl">Loading...</p>
+      </div>
+    )
+  }
+
+  // If no session after loading is complete, show message (middleware should handle redirect)
+  if (status === 'unauthenticated' || !session) {
+    return (
+      <div className="container mx-auto px-4 py-16 text-center">
+        <p className="text-xl">Please sign in to view your profile.</p>
       </div>
     )
   }

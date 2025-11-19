@@ -52,7 +52,11 @@ function SignInForm() {
   if (status === 'authenticated' && session) {
     const targetPath = session.user?.role === 'ADMIN' ? '/admin' : '/profile'
     router.replace(targetPath)
-    return null
+    return (
+      <div className="container mx-auto px-4 py-16 text-center">
+        <p className="text-xl">Redirecting...</p>
+      </div>
+    )
   }
 
   const onSubmit = async (data: SignInFormData) => {
