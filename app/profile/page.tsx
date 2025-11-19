@@ -40,9 +40,7 @@ export default function ProfilePage() {
 
     // If no session, redirect to sign-in
     if (status === 'unauthenticated' || !session) {
-      if (typeof window !== 'undefined') {
-        window.location.href = '/auth/signin?callbackUrl=/profile'
-      }
+      window.location.href = '/auth/signin?callbackUrl=/profile'
       return
     }
 

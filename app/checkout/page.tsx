@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/store/cart-store'
@@ -32,6 +32,16 @@ export default function CheckoutPage() {
   const clearCart = useCartStore((state) => state.clearCart)
   const [loading, setLoading] = useState(false)
 
+  // Use useEffect for redirects to avoid hydration issues
+  useEffect(() => {
+    if (status === 'loading') return
+
+    // If not authenticated, redirect to sign-in
+    if (status === 'unauthenticated' || !session) {
+      window.location.href = '/auth/signin?callbackUrl=/checkout'
+    }
+  }, [status, session])
+
   // Show loading while checking session
   if (status === 'loading') {
     return (
@@ -41,14 +51,8 @@ export default function CheckoutPage() {
     )
   }
 
-  // If not authenticated, redirect to sign-in
+  // If not authenticated, show redirecting message
   if (status === 'unauthenticated' || !session) {
-    // Use useEffect to avoid hydration issues
-    if (typeof window !== 'undefined') {
-      setTimeout(() => {
-        window.location.href = '/auth/signin?callbackUrl=/checkout'
-      }, 100)
-    }
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <p className="text-xl">Redirecting to sign-in...</p>

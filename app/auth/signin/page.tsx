@@ -5,7 +5,7 @@ import { signIn, useSession } from 'next-auth/react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 import Link from 'next/link'
 import { useToast } from '@/components/ToastProvider'
 
@@ -48,6 +48,14 @@ function SignInForm() {
 
   const callbackPath = getCallbackPath()
 
+  // Use useEffect for redirects to avoid hydration issues
+  useEffect(() => {
+    if (status === 'authenticated' && session) {
+      const targetPath = session.user?.role === 'ADMIN' ? '/admin' : '/profile'
+      window.location.href = targetPath
+    }
+  }, [status, session])
+
   // Show loading while session is being processed
   if (status === 'loading') {
     return (
@@ -57,17 +65,8 @@ function SignInForm() {
     )
   }
 
-  // If user is already authenticated, redirect them
+  // If user is already authenticated, show redirecting message
   if (status === 'authenticated' && session) {
-    const targetPath = session.user?.role === 'ADMIN' ? '/admin' : '/profile'
-    
-    // Use useEffect to avoid hydration issues
-    if (typeof window !== 'undefined') {
-      setTimeout(() => {
-        window.location.href = targetPath
-      }, 100)
-    }
-    
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <p className="text-xl">Redirecting to your dashboard...</p>

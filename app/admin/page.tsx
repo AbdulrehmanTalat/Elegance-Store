@@ -51,17 +51,13 @@ export default function AdminPage() {
 
     // If no session, redirect to sign-in
     if (status === 'unauthenticated' || !session) {
-      if (typeof window !== 'undefined') {
-        window.location.href = '/auth/signin?callbackUrl=/admin'
-      }
+      window.location.href = '/auth/signin?callbackUrl=/admin'
       return
     }
 
     // If not admin, redirect to home
     if (session.user?.role !== 'ADMIN') {
-      if (typeof window !== 'undefined') {
-        window.location.href = '/'
-      }
+      window.location.href = '/'
       return
     }
 
