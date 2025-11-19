@@ -13,6 +13,7 @@ const signInSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(1, 'Password is required'),
 })
+})
 
 type SignInFormData = z.infer<typeof signInSchema>
 
@@ -51,7 +52,12 @@ function SignInForm() {
   // Redirect authenticated users away from sign-in page
   if (status === 'authenticated' && session) {
     const targetPath = session.user?.role === 'ADMIN' ? '/admin' : '/profile'
-    router.replace(targetPath)
+    
+    // Use window.location for more reliable redirect
+    if (typeof window !== 'undefined') {
+      window.location.href = targetPath
+    }
+    
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <p className="text-xl">Redirecting...</p>
