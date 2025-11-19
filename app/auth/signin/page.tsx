@@ -60,7 +60,14 @@ function SignInForm() {
   // If user is already authenticated, redirect them
   if (status === 'authenticated' && session) {
     const targetPath = session.user?.role === 'ADMIN' ? '/admin' : '/profile'
-    window.location.href = targetPath
+    
+    // Use useEffect to avoid hydration issues
+    if (typeof window !== 'undefined') {
+      setTimeout(() => {
+        window.location.href = targetPath
+      }, 100)
+    }
+    
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <p className="text-xl">Redirecting to your dashboard...</p>
