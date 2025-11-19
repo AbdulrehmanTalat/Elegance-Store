@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 // Base URL for images - reads from EMAIL_IMAGE_BASE_URL environment variable
 // For emails, we need a publicly accessible URL (not localhost)
 // Set EMAIL_IMAGE_BASE_URL in your .env file or Vercel environment variables
-const EMAIL_IMAGE_BASE_URL = process.env.EMAIL_IMAGE_BASE_URL || process.env.NEXTAUTH_URL || 'https://elegance-store-self.vercel.app'
+const EMAIL_IMAGE_BASE_URL = process.env.EMAIL_IMAGE_BASE_URL || process.env.NEXTAUTH_URL || 'https://elegance-store-seven.vercel.app'
 const STORE_NAME = 'Elegance Store'
 const STORE_COLOR = '#ec4899'
 
@@ -22,7 +22,7 @@ const getEmailImageUrl = (imageName: string) => {
   // Ensure baseUrl doesn't have trailing slash and doesn't include localhost
   let baseUrl = EMAIL_IMAGE_BASE_URL.replace(/\/$/, '') // Remove trailing slash
   if (baseUrl.includes('localhost')) {
-    baseUrl = baseUrl.replace('localhost:3000', 'elegance-store-self.vercel.app')
+    baseUrl = baseUrl.replace('localhost:3000', 'elegance-store-seven.vercel.app')
   }
   return `${baseUrl}/email-images/${imageName}`
 }

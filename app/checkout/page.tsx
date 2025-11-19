@@ -20,6 +20,7 @@ const checkoutSchema = z.object({
   phone: z.string().min(10, 'Phone number must be at least 10 digits'),
   paymentMethod: z.enum(['ONLINE', 'COD']),
 })
+})
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>
 
