@@ -17,7 +17,7 @@ const EMAIL_IMAGE_BASE_URL = process.env.EMAIL_IMAGE_BASE_URL || process.env.NEX
 const STORE_NAME = 'Elegance Store'
 const STORE_COLOR = '#ec4899'
 
-// Helper function to get email image URL
+// Helper function to get email image URL (for email-images folder)
 const getEmailImageUrl = (imageName: string) => {
   // Ensure baseUrl doesn't have trailing slash and doesn't include localhost
   let baseUrl = EMAIL_IMAGE_BASE_URL.replace(/\/$/, '') // Remove trailing slash
@@ -25,6 +25,37 @@ const getEmailImageUrl = (imageName: string) => {
     baseUrl = baseUrl.replace('localhost:3000', 'elegance-store-seven.vercel.app')
   }
   return `${baseUrl}/email-images/${imageName}`
+}
+
+// Helper function to build product image URL for emails
+const buildProductImageUrl = (imagePath: string | null | undefined): string => {
+  // Default fallback image
+  const fallbackImage = getEmailImageUrl('lingerie.png')
+  
+  if (!imagePath || !imagePath.trim()) {
+    return fallbackImage
+  }
+
+  const image = imagePath.trim()
+  let baseUrl = EMAIL_IMAGE_BASE_URL.replace(/\/$/, '') // Remove trailing slash
+  
+  // Replace localhost with production URL if needed
+  if (baseUrl.includes('localhost')) {
+    baseUrl = baseUrl.replace('localhost:3000', 'elegance-store-seven.vercel.app')
+  }
+
+  // If it's already a full URL, use it as is
+  if (image.startsWith('http://') || image.startsWith('https://')) {
+    return image
+  }
+  
+  // If it starts with /, it's a relative path
+  if (image.startsWith('/')) {
+    return `${baseUrl}${image}`
+  }
+  
+  // If it's just a filename, assume it's in uploads folder
+  return `${baseUrl}/uploads/${image}`
 }
 
 interface OrderItem {
@@ -50,7 +81,11 @@ export async function sendOrderConfirmationEmail(
   try {
     // Debug: Log image URLs being used
     console.log('EMAIL_IMAGE_BASE_URL:', EMAIL_IMAGE_BASE_URL)
-    console.log('Order items with images:', items.map(item => ({ name: item.productName, image: item.image })))
+    console.log('Order items with images:', items.map(item => ({ 
+      name: item.productName, 
+      originalImage: item.image,
+      builtImageUrl: buildProductImageUrl(item.image)
+    })))
     await transporter.sendMail({
       from: process.env.SMTP_FROM || process.env.SMTP_USER,
       to: email,
@@ -97,22 +132,8 @@ export async function sendOrderConfirmationEmail(
                       <!-- Order Items -->
                       <h3 style="color: #333333; font-size: 20px; margin: 30px 0 20px 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Order Items</h3>
                       ${items.map((item) => {
-                        // Build image URL - handle both absolute and relative paths
-                        let imageUrl = getEmailImageUrl('lingerie.png') // default fallback
-                        if (item.image && item.image.trim()) {
-                          const image = item.image.trim()
-                          if (image.startsWith('http://') || image.startsWith('https://')) {
-                            imageUrl = image
-                          } else if (image.startsWith('/')) {
-                            // Relative path like /uploads/image.jpg
-                            const baseUrl = EMAIL_IMAGE_BASE_URL.replace(/\/$/, '') // Remove trailing slash
-                            imageUrl = `${baseUrl}${image}`
-                          } else {
-                            // Just filename, assume it's in uploads
-                            const baseUrl = EMAIL_IMAGE_BASE_URL.replace(/\/$/, '') // Remove trailing slash
-                            imageUrl = `${baseUrl}/uploads/${image}`
-                          }
-                        }
+                        // Build image URL using helper function
+                        const imageUrl = buildProductImageUrl(item.image)
                         
                         return `
                         <div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 15px;">
@@ -228,19 +249,8 @@ export async function sendAdminOrderNotificationEmail(
                           ? `${item.bandSize} ${item.cupSize}`.trim()
                           : item.size || ''
                         
-                        // Build image URL - handle both absolute and relative paths
-                        let imageUrl = getEmailImageUrl('lingerie.png') // default fallback
-                        if (item.image) {
-                          if (item.image.startsWith('http://') || item.image.startsWith('https://')) {
-                            imageUrl = item.image
-                          } else if (item.image.startsWith('/')) {
-                            // Relative path like /uploads/image.jpg
-                            imageUrl = `${EMAIL_IMAGE_BASE_URL}${item.image}`
-                          } else {
-                            // Just filename, assume it's in uploads
-                            imageUrl = `${EMAIL_IMAGE_BASE_URL}/uploads/${item.image}`
-                          }
-                        }
+                        // Build image URL using helper function
+                        const imageUrl = buildProductImageUrl(item.image)
                         
                         return `
                         <div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-bottom: 12px;">
@@ -361,22 +371,8 @@ export async function sendOrderStatusUpdateEmail(
                       <!-- Order Items -->
                       <h3 style="color: #333333; font-size: 20px; margin: 30px 0 20px 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Order Items</h3>
                       ${items.map((item) => {
-                        // Build image URL - handle both absolute and relative paths
-                        let imageUrl = getEmailImageUrl('lingerie.png') // default fallback
-                        if (item.image && item.image.trim()) {
-                          const image = item.image.trim()
-                          if (image.startsWith('http://') || image.startsWith('https://')) {
-                            imageUrl = image
-                          } else if (image.startsWith('/')) {
-                            // Relative path like /uploads/image.jpg
-                            const baseUrl = EMAIL_IMAGE_BASE_URL.replace(/\/$/, '') // Remove trailing slash
-                            imageUrl = `${baseUrl}${image}`
-                          } else {
-                            // Just filename, assume it's in uploads
-                            const baseUrl = EMAIL_IMAGE_BASE_URL.replace(/\/$/, '') // Remove trailing slash
-                            imageUrl = `${baseUrl}/uploads/${image}`
-                          }
-                        }
+                        // Build image URL using helper function
+                        const imageUrl = buildProductImageUrl(item.image)
                         
                         return `
                         <div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 15px;">
