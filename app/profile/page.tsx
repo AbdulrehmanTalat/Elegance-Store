@@ -34,9 +34,13 @@ export default function ProfilePage() {
   const addItem = useCartStore((state) => state.addItem)
 
   useEffect(() => {
-    // Middleware handles authentication - don't redirect here
-    // Just wait for session to load and fetch orders
     if (status === 'loading') {
+      return
+    }
+
+    // If no session, redirect to sign-in
+    if (status === 'unauthenticated' || !session) {
+      window.location.href = '/auth/signin?callbackUrl=/profile'
       return
     }
 
@@ -44,7 +48,6 @@ export default function ProfilePage() {
     if (session) {
       fetchOrders()
     }
-    // If no session after loading, middleware will handle redirect
   }, [session, status])
 
   const fetchOrders = async () => {

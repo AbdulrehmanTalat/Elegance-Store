@@ -41,6 +41,16 @@ export default function CheckoutPage() {
     )
   }
 
+  // If not authenticated, redirect to sign-in
+  if (status === 'unauthenticated' || !session) {
+    window.location.href = '/auth/signin?callbackUrl=/checkout'
+    return (
+      <div className="container mx-auto px-4 py-16 text-center">
+        <p className="text-xl">Redirecting to sign-in...</p>
+      </div>
+    )
+  }
+
   const {
     register,
     handleSubmit,
