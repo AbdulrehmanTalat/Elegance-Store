@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Heart, ShoppingCart, Trash2, ArrowRight } from 'lucide-react'
-import { useCartStore } from '@/lib/store'
+import { useCartStore } from '@/store/cart-store'
 import { useToast } from '@/components/ToastProvider'
 import { useRouter } from 'next/navigation'
 
