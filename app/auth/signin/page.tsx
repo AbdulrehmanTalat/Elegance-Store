@@ -54,7 +54,38 @@ function SignInForm() {
       const targetPath = session.user?.role === 'ADMIN' ? '/admin' : '/profile'
       router.push(targetPath)
     }
-  }, [status, session, router])
+
+    // Handle errors from URL
+    const error = searchParams.get('error')
+    if (error) {
+      let errorMessage = 'An error occurred. Please try again.'
+      
+      switch (error) {
+        case 'UserNotFound':
+          errorMessage = 'No account found with this email. Please sign up.'
+          break
+        case 'InvalidPassword':
+          errorMessage = 'Invalid password. Please try again.'
+          break
+        case 'EmailNotVerified':
+          errorMessage = 'Please verify your email before signing in.'
+          break
+        case 'UserHasNoPassword':
+          errorMessage = 'Account exists but has no password. Try signing in with Google/Facebook.'
+          break
+        case 'CredentialsSignin':
+          // Fallback for generic credentials error if specific one isn't passed
+          errorMessage = 'Sign in failed. Check your details and try again.'
+          break
+      }
+      
+      showError(errorMessage)
+      
+      // Clean up URL
+      const newUrl = window.location.pathname + (rawCallbackUrl ? `?callbackUrl=${rawCallbackUrl}` : '')
+      window.history.replaceState({}, '', newUrl)
+    }
+  }, [status, session, router, searchParams, showError, rawCallbackUrl])
 
   // Show loading while session is being processed
   if (status === 'loading') {

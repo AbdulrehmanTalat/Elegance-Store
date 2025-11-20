@@ -42,20 +42,20 @@ export const authOptions: NextAuthOptions = {
 
         if (!user) {
           console.log('Auth: User not found')
-          return null
+          throw new Error('UserNotFound')
         }
 
         if (!user.password) {
           console.log('Auth: User has no password')
-          return null
+          throw new Error('UserHasNoPassword')
         }
 
         // Check if email is verified (admins can bypass this check)
         if (!user.emailVerified && user.role !== 'ADMIN') {
           console.log('Auth: Email not verified')
-          throw new Error('Please verify your email first')
+          throw new Error('EmailNotVerified')
         }
-        
+
         // Auto-verify admin emails if not already verified
         if (user.role === 'ADMIN' && !user.emailVerified) {
           console.log('Auth: Auto-verifying admin email')
@@ -75,7 +75,7 @@ export const authOptions: NextAuthOptions = {
 
         if (!isPasswordValid) {
           console.log('Auth: Invalid password')
-          return null
+          throw new Error('InvalidPassword')
         }
 
         console.log('Auth: Login successful for:', user.email)
@@ -100,7 +100,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, trigger }) {
       const fourHoursInSeconds = 4 * 60 * 60
       const now = Math.floor(Date.now() / 1000)
-      
+
       if (user) {
         // New token creation - set expiration to 4 hours from now
         token.role = (user as any).role
@@ -111,7 +111,7 @@ export const authOptions: NextAuthOptions = {
         // For existing tokens, check and fix expiration
         const currentExp = typeof token.exp === 'number' ? token.exp : 0
         const hoursFromNow = currentExp > 0 ? Math.floor((currentExp - now) / (60 * 60)) : 0
-        
+
         // If expiration is more than 8 hours (catches old long-lived tokens), fix it
         if (!token.exp || currentExp > now + (8 * 60 * 60)) {
           token.exp = now + fourHoursInSeconds
@@ -120,12 +120,12 @@ export const authOptions: NextAuthOptions = {
           console.log('JWT: Token exp is correct:', hoursFromNow, 'hours from now')
         }
       }
-      
+
       // Ensure token.exp is always set correctly
       if (!token.exp || (typeof token.exp === 'number' && token.exp > now + (8 * 60 * 60))) {
         token.exp = now + fourHoursInSeconds
       }
-      
+
       return token
     },
     async session({ session, token }) {
@@ -133,7 +133,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string
         session.user.role = token.role as string
       }
-      
+
       // Explicitly set session.expires from token.exp
       // NextAuth doesn't always use token.exp correctly, so we force it
       if (token.exp && typeof token.exp === 'number') {
@@ -144,29 +144,29 @@ export const authOptions: NextAuthOptions = {
         fourHoursFromNow.setHours(fourHoursFromNow.getHours() + 4)
         session.expires = fourHoursFromNow.toISOString()
       }
-      
+
       return session
     },
     async redirect({ url, baseUrl }) {
       // Parse the URL to handle both relative and absolute paths
       let targetUrl = url
-      
+
       // If it's a relative path, make it absolute
       if (url.startsWith('/')) {
         targetUrl = `${baseUrl}${url}`
       }
-      
+
       // Parse to get the pathname
       try {
         const parsed = new URL(targetUrl)
         const pathname = parsed.pathname
-        
+
         // Never redirect back to sign-in or auth pages
         if (pathname === '/auth/signin' || pathname.startsWith('/auth/')) {
           // Default to /profile - middleware will redirect admins to /admin
           return `${baseUrl}/profile`
         }
-        
+
         // If it's the same origin, return the full URL
         if (parsed.origin === baseUrl) {
           return targetUrl
@@ -174,7 +174,7 @@ export const authOptions: NextAuthOptions = {
       } catch {
         // If URL parsing fails, default to /profile
       }
-      
+
       // Default: redirect to /profile (middleware will handle admin redirect)
       return `${baseUrl}/profile`
     },
