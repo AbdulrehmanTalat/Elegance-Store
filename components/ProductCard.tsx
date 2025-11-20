@@ -241,7 +241,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         </p>
 
         {/* Rating */}
-        {product.avgRating && product.avgRating > 0 && (
+        {(product.avgRating || 0) > 0 && (
           <div className="flex items-center gap-2 mb-3">
             <div className="flex">
               {[1, 2, 3, 4, 5].map((star) => (
