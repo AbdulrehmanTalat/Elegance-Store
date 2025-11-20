@@ -312,7 +312,7 @@ export default function ProfilePage() {
                       {...register('address')}
                       rows={2}
                       disabled={!isEditing}
-                      placehold="123 Main Street..."
+                      placeholder="123 Main Street..."
                       className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none transition-all resize-none disabled:bg-gray-50"
                     />
                   </div>
