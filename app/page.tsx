@@ -4,6 +4,7 @@ import HeroSection from '@/components/home/HeroSection'
 import CategoryCard from '@/components/home/CategoryCard'
 import FeatureCard from '@/components/home/FeatureCard'
 import NewsletterSection from '@/components/home/NewsletterSection'
+import JsonLd from '@/components/JsonLd'
 
 export const dynamic = 'force-dynamic'
 
@@ -118,8 +119,23 @@ export default async function Home() {
     },
   ]
 
+  const organizationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Elegance Store',
+    url: 'https://elegance-store.vercel.app',
+    logo: 'https://elegance-store.vercel.app/logo.png',
+    description: 'Premium lingerie, jewelry, and makeup store in Pakistan',
+    sameAs: [
+      'https://facebook.com/elegancestore',
+      'https://instagram.com/elegancestore',
+      'https://twitter.com/elegancestore',
+    ],
+  }
+
   return (
     <div className="bg-gray-50">
+      <JsonLd data={organizationSchema} />
       {/* Hero Section */}
       <HeroSection />
 
