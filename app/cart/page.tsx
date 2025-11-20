@@ -115,16 +115,6 @@ export default function CartPage() {
                         <span className="text-2xl font-bold text-primary-600">
                           Rs {item.price.toLocaleString()}
                         </span>
-                        {item.color && (
-                          <span className="bg-gray-100 px-3 py-1 rounded-full text-sm">
-                            Color: {item.color}
-                          </span>
-                        )}
-                        {item.size && (
-                          <span className="bg-gray-100 px-3 py-1 rounded-full text-sm">
-                            Size: {item.size}
-                          </span>
-                        )}
                       </div>
                     </div>
 
