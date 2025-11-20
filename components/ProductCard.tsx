@@ -39,8 +39,6 @@ export default function ProductCard({ product }: ProductCardProps) {
   let displayPrice: number | null = null
   let priceText = ''
   let totalStock = 0
-  let isOnSale = false
-  let originalPrice: number | null = null
 
   if (hasVariantsWithData && product.colors) {
     const colors = product.colors
@@ -157,11 +155,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 Only {totalStock} Left!
               </span>
             )}
-            {isOnSale && (
-              <span className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                Sale
-              </span>
-            )}
+
           </div>
 
           {/* Wishlist Button */}
@@ -219,11 +213,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Price & Add to Cart */}
         <div className="flex justify-between items-center mt-4">
           <div>
-            {originalPrice && (
-              <span className="text-sm text-gray-400 line-through block">
-                Rs {originalPrice.toLocaleString()}
-              </span>
-            )}
+
             <span className="text-2xl font-bold text-primary-600">
               {priceText}
             </span>
