@@ -16,7 +16,7 @@ export default function CartPage() {
   const getTotal = useCartStore((state) => state.getTotal)
 
   const total = getTotal()
-  const shipping = 0 // Free shipping
+  const shipping: number = 0 // Free shipping
   const tax = total * 0.0 // No tax for now
   const grandTotal = total + shipping + tax
   const freeShippingThreshold = 3000
