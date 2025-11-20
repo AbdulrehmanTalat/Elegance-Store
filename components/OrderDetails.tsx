@@ -131,7 +131,7 @@ export default function OrderDetails({
         {/* Header */}
         <div className="mb-8">
           <Link
-            href="/orders"
+            href="/profile"
             className="text-primary-600 hover:text-primary-700 flex items-center gap-2 mb-4 inline-flex"
           >
             <ArrowLeft size={20} />

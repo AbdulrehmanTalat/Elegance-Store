@@ -69,7 +69,7 @@ export default async function OrderPage({
             We couldn't find the order you're looking for.
           </p>
           <Link
-            href="/orders"
+            href="/profile"
             className="inline-block bg-primary-600 text-white px-8 py-4 rounded-xl hover:bg-primary-700 transition"
           >
             View All Orders
