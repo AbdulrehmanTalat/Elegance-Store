@@ -24,6 +24,27 @@ async function getProduct(id: string) {
   }
 }
 
+async function getReviews(productId: string) {
+  try {
+    const reviews = await prisma.review.findMany({
+      where: { productId },
+      include: {
+        user: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      take: 10, // Limit to top 10 reviews
+      orderBy: { createdAt: 'desc' },
+    })
+    return reviews
+  } catch (error) {
+    console.error('Error fetching reviews:', error)
+    return []
+  }
+}
+
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const product = await getProduct(params.id)
 
@@ -58,6 +79,7 @@ export default async function ProductPage({
   params: { id: string }
 }) {
   const product = await getProduct(params.id)
+  const reviews = await getReviews(params.id)
 
   if (!product || !product.isActive) {
     notFound()
@@ -216,11 +238,36 @@ export default async function ProductPage({
     ],
   }
 
+  // Individual review schema
+  const reviewSchemas = reviews.map((review) => ({
+    '@context': 'https://schema.org',
+    '@type': 'Review',
+    reviewRating: {
+      '@type': 'Rating',
+      ratingValue: review.rating,
+      bestRating: 5,
+      worstRating: 1,
+    },
+    author: {
+      '@type': 'Person',
+      name: review.user.name || 'Anonymous',
+    },
+    reviewBody: review.comment || '',
+    datePublished: review.createdAt.toISOString(),
+    itemReviewed: {
+      '@type': 'Product',
+      name: product.name,
+    },
+  }))
+
   return (
     <div className="container mx-auto px-4 py-8">
       <JsonLd data={productSchema} />
       <JsonLd data={breadcrumbSchema} />
       <JsonLd data={faqSchema} />
+      {reviewSchemas.map((reviewSchema, index) => (
+        <JsonLd key={index} data={reviewSchema} />
+      ))}
       <ProductDetails
         productId={product.id}
         productName={product.name}

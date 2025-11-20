@@ -133,9 +133,25 @@ export default async function Home() {
     ],
   }
 
+  const websiteSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Elegance Store',
+    url: 'https://elegance-store.vercel.app',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: 'https://elegance-store.vercel.app/products?search={search_term_string}',
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  }
+
   return (
     <div className="bg-gray-50">
       <JsonLd data={organizationSchema} />
+      <JsonLd data={websiteSchema} />
       {/* Hero Section */}
       <HeroSection />
 

@@ -5,6 +5,56 @@ import SearchBar from '@/components/products/SearchBar'
 import FilterSidebar from '@/components/products/FilterSidebar'
 import ActiveFilters from '@/components/products/ActiveFilters'
 import ProductsHeader from '@/components/products/ProductsHeader'
+import { Metadata } from 'next'
+
+const categoryInfo = {
+  UNDERGARMENTS: {
+    title: 'Lingerie & Undergarments',
+    description: 'Discover premium lingerie, bras, panties, and sleepwear at Elegance Store. Comfortable, stylish, and affordable undergarments for every woman.',
+    keywords: 'lingerie, bras, panties, underwear, sleepwear, intimate wear',
+  },
+  JEWELRY: {
+    title: 'Jewelry & Accessories',
+    description: 'Explore our stunning collection of jewelry including necklaces, earrings, bracelets, and rings. Premium quality accessories at affordable prices.',
+    keywords: 'jewelry, necklaces, earrings, bracelets, rings, accessories',
+  },
+  MAKEUP: {
+    title: 'Makeup & Cosmetics',
+    description: 'Shop premium makeup and cosmetics including lipsticks, foundations, eyeshadows, and more. Quality beauty products for every skin tone.',
+    keywords: 'makeup, cosmetics, lipstick, foundation, eyeshadow, beauty products',
+  },
+}
+
+export async function generateMetadata({ searchParams }: ProductsPageProps): Promise<Metadata> {
+  const category = searchParams.category as keyof typeof categoryInfo | undefined
+  const search = searchParams.search
+
+  if (search) {
+    return {
+      title: `Search: ${search} | Elegance Store`,
+      description: `Search results for "${search}". Find the best products at Elegance Store.`,
+    }
+  }
+
+  if (category && categoryInfo[category]) {
+    const info = categoryInfo[category]
+    return {
+      title: `${info.title} | Elegance Store`,
+      description: info.description,
+      keywords: info.keywords,
+      openGraph: {
+        title: `${info.title} | Elegance Store`,
+        description: info.description,
+      },
+    }
+  }
+
+  return {
+    title: 'Shop All Products | Elegance Store',
+    description: 'Browse our complete collection of lingerie, jewelry, and makeup. Premium quality products at affordable prices with free shipping.',
+    keywords: 'online shopping, lingerie, jewelry, makeup, beauty products, fashion',
+  }
+}
 
 interface ProductsPageProps {
   searchParams: {
