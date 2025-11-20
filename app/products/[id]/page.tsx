@@ -77,22 +77,78 @@ export default async function ProductPage({
     }))
   ) || []
 
+  // Calculate stock status
+  const totalStock = hasVariants 
+    ? product.colors?.flatMap(c => c.variants || []).reduce((sum, v) => sum + (v.stock || 0), 0) || 0
+    : (product as any).stock || 0
+
+  const stockAvailability = totalStock > 0 
+    ? 'https://schema.org/InStock' 
+    : 'https://schema.org/OutOfStock'
+
   const productSchema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
     description: product.description,
     image: displayImage,
+    brand: {
+      '@type': 'Brand',
+      name: 'Elegance Store',
+    },
     offers: {
       '@type': 'Offer',
-      price: product.basePrice,
+      url: `https://elegance-store.vercel.app/products/${product.id}`,
       priceCurrency: 'PKR',
-      availability: 'https://schema.org/InStock',
+      price: product.basePrice || 0,
+      priceValidUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      availability: stockAvailability,
+      seller: {
+        '@type': 'Organization',
+        name: 'Elegance Store',
+      },
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        shippingRate: {
+          '@type': 'MonetaryAmount',
+          value: 0,
+          currency: 'PKR',
+        },
+        shippingDestination: {
+          '@type': 'DefinedRegion',
+          addressCountry: 'PK',
+        },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 1,
+            maxValue: 2,
+            unitCode: 'DAY',
+          },
+          transitTime: {
+            '@type': 'QuantitativeValue',
+            minValue: 3,
+            maxValue: 7,
+            unitCode: 'DAY',
+          },
+        },
+      },
+      hasMerchantReturnPolicy: {
+        '@type': 'MerchantReturnPolicy',
+        applicableCountry: 'PK',
+        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+        merchantReturnDays: 30,
+        returnMethod: 'https://schema.org/ReturnByMail',
+        returnFees: 'https://schema.org/FreeReturn',
+      },
     },
     aggregateRating: (product.avgRating || 0) > 0 ? {
       '@type': 'AggregateRating',
       ratingValue: product.avgRating,
       reviewCount: product.reviewCount,
+      bestRating: 5,
+      worstRating: 1,
     } : undefined,
   }
 
@@ -121,10 +177,50 @@ export default async function ProductPage({
     ],
   }
 
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is your shipping policy?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'We offer free shipping on all orders across Pakistan. Orders are processed within 1-2 business days and typically arrive within 3-7 business days.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What is your return policy?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'We offer a 30-day return policy on all products. Returns are free and hassle-free. Items must be unused and in their original packaging.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do I choose the right size?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'Please refer to our size guide available on each product page. If you need assistance, our customer support team is available 24/7 to help you find the perfect fit.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How do I care for this product?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'For best results, hand wash in cold water with mild detergent and air dry. Avoid bleach and ironing. Detailed care instructions are included with each product.',
+        },
+      },
+    ],
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <JsonLd data={productSchema} />
       <JsonLd data={breadcrumbSchema} />
+      <JsonLd data={faqSchema} />
       <ProductDetails
         productId={product.id}
         productName={product.name}

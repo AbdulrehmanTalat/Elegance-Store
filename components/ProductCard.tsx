@@ -174,6 +174,8 @@ export default function ProductCard({ product }: ProductCardProps) {
                 src={finalDisplayImage}
                 alt={product.name}
                 fill
+                loading="lazy"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 className={`object-cover transition-all duration-500 ${
                   isHovered && hoverImage && !selectedImage ? 'opacity-0' : 'opacity-100'
                 }`}
@@ -183,6 +185,8 @@ export default function ProductCard({ product }: ProductCardProps) {
                   src={hoverImage}
                   alt={`${product.name} - alternate view`}
                   fill
+                  loading="lazy"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   className={`object-cover transition-all duration-500 ${
                     isHovered ? 'opacity-100 scale-110' : 'opacity-0'
                   }`}
