@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Plus, Edit, Trash2, Key, Palette } from 'lucide-react'
+import { Plus, Edit, Trash2, Key, Palette, Filter, Search } from 'lucide-react'
 import ProductModal from '@/components/ProductModal'
 import ProductVariantModal from '@/components/ProductVariantModal'
 import { useToast } from '@/components/ToastProvider'
@@ -45,6 +45,41 @@ export default function AdminPage() {
   const [variantColors, setVariantColors] = useState<any[]>([])
   const [variantVariants, setVariantVariants] = useState<any[]>([])
   const [productSubcategory, setProductSubcategory] = useState<string | null>(null)
+  
+  // Filter states
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('active') // Default to active only
+  const [categoryFilter, setCategoryFilter] = useState<string>('all')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
+
+  // Apply filters whenever products or filters change
+  useEffect(() => {
+    let filtered = products
+
+    // Status filter
+    if (statusFilter === 'active') {
+      filtered = filtered.filter(p => p.isActive)
+    } else if (statusFilter === 'inactive') {
+      filtered = filtered.filter(p => !p.isActive)
+    }
+
+    // Category filter
+    if (categoryFilter !== 'all') {
+      filtered = filtered.filter(p => p.category === categoryFilter)
+    }
+
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(p => 
+        p.name.toLowerCase().includes(query) || 
+        p.description.toLowerCase().includes(query) ||
+        p.category.toLowerCase().includes(query)
+      )
+    }
+
+    setFilteredProducts(filtered)
+  }, [products, statusFilter, categoryFilter, searchQuery])
 
   useEffect(() => {
     if (status === 'loading') return
@@ -281,6 +316,49 @@ export default function AdminPage() {
         </Link>
       </div>
 
+      <div className="bg-white p-4 rounded-lg shadow-sm mb-6 space-y-4 md:space-y-0 md:flex md:flex-wrap md:gap-4 md:items-center">
+        <div className="flex items-center gap-2 text-gray-700">
+          <Filter size={20} />
+          <span className="font-medium">Filters:</span>
+        </div>
+        
+        <div className="relative flex-1 min-w-[200px]">
+          <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+          />
+        </div>
+
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value as any)}
+          className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+        >
+          <option value="active">Active Only</option>
+          <option value="inactive">Inactive Only</option>
+          <option value="all">All Status</option>
+        </select>
+
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+        >
+          <option value="all">All Categories</option>
+          <option value="UNDERGARMENTS">Undergarments</option>
+          <option value="JEWELRY">Jewelry</option>
+          <option value="MAKEUP">Makeup</option>
+        </select>
+
+        <div className="ml-auto text-sm text-gray-500 font-medium">
+          {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found
+        </div>
+      </div>
+
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-100">
@@ -312,7 +390,7 @@ export default function AdminPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <tr key={product.id}>
                 <td className="px-6 py-4">
                   <img
