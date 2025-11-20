@@ -90,7 +90,7 @@ export default function WishlistPage() {
 
   const handleAddToCart = (item: WishlistItem) => {
     const price = item.variant ? item.variant.price : (item.product.basePrice || 0)
-    const image = item.variant?.color?.images?.[0] || item.product.image || '/placeholder.png'
+    const image = item.variant?.color?.images?.[0] || item.product.image || item.product.colors?.[0]?.images?.[0] || '/placeholder.png'
     
     // Construct variant name if applicable
     let variantName = ''
@@ -151,7 +151,7 @@ export default function WishlistPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {items.map((item) => {
             const price = item.variant ? item.variant.price : item.product.basePrice
-            const image = item.variant?.color?.images?.[0] || item.product.image || '/placeholder.png'
+            const image = item.variant?.color?.images?.[0] || item.product.image || item.product.colors?.[0]?.images?.[0] || '/placeholder.png'
             
             return (
               <div key={item.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition group">
