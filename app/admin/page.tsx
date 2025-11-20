@@ -266,12 +266,18 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-6 flex gap-4">
+        <Link
+          href="/admin/dashboard"
+          className="text-primary-600 hover:underline font-medium"
+        >
+          📊 View Dashboard & Analytics →
+        </Link>
         <Link
           href="/admin/orders"
           className="text-primary-600 hover:underline"
         >
-          View Orders →
+          📦 View Orders →
         </Link>
       </div>
 
