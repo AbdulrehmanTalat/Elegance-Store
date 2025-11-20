@@ -21,13 +21,11 @@ export async function GET(request: Request) {
             )
         }
 
-        const item = await prisma.wishlist.findUnique({
+        const item = await prisma.wishlist.findFirst({
             where: {
-                userId_productId_variantId: {
-                    userId: session.user.id,
-                    productId,
-                    variantId: variantId || null,
-                },
+                userId: session.user.id,
+                productId,
+                variantId: variantId || null,
             },
         })
 

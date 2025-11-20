@@ -69,13 +69,11 @@ export async function POST(request: Request) {
         }
 
         // Check if already exists
-        const existing = await prisma.wishlist.findUnique({
+        const existing = await prisma.wishlist.findFirst({
             where: {
-                userId_productId_variantId: {
-                    userId: session.user.id,
-                    productId,
-                    variantId: variantId || null, // Handle optional variantId
-                },
+                userId: session.user.id,
+                productId,
+                variantId: variantId || null,
             },
         })
 
