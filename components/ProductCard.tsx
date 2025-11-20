@@ -32,6 +32,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem)
   const [isHovered, setIsHovered] = useState(false)
   const [isInWishlist, setIsInWishlist] = useState(false)
+  const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const { data: session } = useSession()
   const { showSuccess, showError } = useToast()
 
@@ -114,22 +115,24 @@ export default function ProductCard({ product }: ProductCardProps) {
   }
 
   // Get display images (primary and hover)
-  let displayImage: string | null = null
+  let defaultDisplayImage: string | null = null
   let hoverImage: string | null = null
   
   if (hasVariants && product.colors) {
     for (const color of product.colors) {
       if (color.images && color.images.length > 0) {
-        if (!displayImage) displayImage = color.images[0]
+        if (!defaultDisplayImage) defaultDisplayImage = color.images[0]
         if (color.images.length > 1 && !hoverImage) hoverImage = color.images[1]
-        if (displayImage && hoverImage) break
+        if (defaultDisplayImage && hoverImage) break
       }
     }
   }
   
-  if (!displayImage) {
-    displayImage = product.image || null
+  if (!defaultDisplayImage) {
+    defaultDisplayImage = product.image || null
   }
+
+  const finalDisplayImage = selectedImage || defaultDisplayImage
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -145,7 +148,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         id: product.id,
         name: product.name,
         price: displayPrice,
-        image: displayImage || '',
+        image: defaultDisplayImage || '',
         quantity: 1,
         productId: product.id,
         category: (product as any).category,
@@ -165,17 +168,17 @@ export default function ProductCard({ product }: ProductCardProps) {
       <Link href={`/products/${product.id}`}>
         {/* Image Container */}
         <div className="relative h-80 w-full bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
-          {displayImage ? (
+          {finalDisplayImage ? (
             <>
               <Image
-                src={displayImage}
+                src={finalDisplayImage}
                 alt={product.name}
                 fill
                 className={`object-cover transition-all duration-500 ${
-                  isHovered && hoverImage ? 'opacity-0' : 'opacity-100'
+                  isHovered && hoverImage && !selectedImage ? 'opacity-0' : 'opacity-100'
                 }`}
               />
-              {hoverImage && (
+              {hoverImage && !selectedImage && (
                 <Image
                   src={hoverImage}
                   alt={`${product.name} - alternate view`}
@@ -292,8 +295,17 @@ export default function ProductCard({ product }: ProductCardProps) {
                 {product.colors.slice(0, 5).map((color, idx) => (
                   <div
                     key={idx}
-                    className="w-6 h-6 rounded-full border-2 border-gray-200 overflow-hidden hover:border-primary-500 transition cursor-pointer"
+                    className={`w-6 h-6 rounded-full border-2 overflow-hidden transition cursor-pointer ${
+                      selectedImage === color.images?.[0] ? 'border-primary-600 ring-1 ring-primary-600' : 'border-gray-200 hover:border-primary-500'
+                    }`}
                     title={color.images?.[0] ? 'View color' : 'Color option'}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      if (color.images?.[0]) {
+                        setSelectedImage(color.images[0])
+                      }
+                    }}
                   >
                     {color.images?.[0] && (
                       <Image
