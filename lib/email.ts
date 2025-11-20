@@ -31,14 +31,14 @@ const getEmailImageUrl = (imageName: string) => {
 const buildProductImageUrl = (imagePath: string | null | undefined): string => {
   // Default fallback image
   const fallbackImage = getEmailImageUrl('lingerie.png')
-  
+
   if (!imagePath || !imagePath.trim()) {
     return fallbackImage
   }
 
   const image = imagePath.trim()
   let baseUrl = EMAIL_IMAGE_BASE_URL.replace(/\/$/, '') // Remove trailing slash
-  
+
   // Replace localhost with production URL if needed
   if (baseUrl.includes('localhost')) {
     baseUrl = baseUrl.replace('localhost:3000', 'elegance-store-seven.vercel.app')
@@ -48,12 +48,12 @@ const buildProductImageUrl = (imagePath: string | null | undefined): string => {
   if (image.startsWith('http://') || image.startsWith('https://')) {
     return image
   }
-  
+
   // If it starts with /, it's a relative path
   if (image.startsWith('/')) {
     return `${baseUrl}${image}`
   }
-  
+
   // If it's just a filename, assume it's in uploads folder
   return `${baseUrl}/uploads/${image}`
 }
@@ -76,13 +76,14 @@ export async function sendOrderConfirmationEmail(
   shippingAddress: string,
   phone: string,
   items: OrderItem[],
-  orderDate?: Date | string
+  orderDate?: Date | string,
+  discountAmount?: number
 ) {
   try {
     // Debug: Log image URLs being used
     console.log('EMAIL_IMAGE_BASE_URL:', EMAIL_IMAGE_BASE_URL)
-    console.log('Order items with images:', items.map(item => ({ 
-      name: item.productName, 
+    console.log('Order items with images:', items.map(item => ({
+      name: item.productName,
       originalImage: item.image,
       builtImageUrl: buildProductImageUrl(item.image)
     })))
@@ -104,7 +105,7 @@ export async function sendOrderConfirmationEmail(
                 <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                   <!-- Header with Store Name -->
                   <tr>
-                    <td style="background: linear-gradient(135deg, ${STORE_COLOR} 0%, #d946ef 100%); padding: 30px; text-align: center;">
+                    <td style="background: linear-gradient(135deg, #ec4899 0%, #9333ea 100%); padding: 30px; text-align: center;">
                       <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: bold; letter-spacing: 2px;">${STORE_NAME}</h1>
                       <p style="color: #ffffff; margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">Elegant Fashion & Beauty</p>
                     </td>
@@ -132,10 +133,10 @@ export async function sendOrderConfirmationEmail(
                       <!-- Order Items -->
                       <h3 style="color: #333333; font-size: 20px; margin: 30px 0 20px 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Order Items</h3>
                       ${items.map((item) => {
-                        // Build image URL using helper function
-                        const imageUrl = buildProductImageUrl(item.image)
-                        
-                        return `
+        // Build image URL using helper function
+        const imageUrl = buildProductImageUrl(item.image)
+
+        return `
                         <div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 15px;">
                           <table width="100%" cellpadding="0" cellspacing="0">
                             <tr>
@@ -155,7 +156,7 @@ export async function sendOrderConfirmationEmail(
                           </table>
                         </div>
                         `
-                      }).join('')}
+      }).join('')}
                       
                       <!-- Shipping Address -->
                       <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 30px 0;">
@@ -245,14 +246,14 @@ export async function sendAdminOrderNotificationEmail(
                       <!-- Order Items -->
                       <h3 style="color: #333333; font-size: 18px; margin: 30px 0 15px 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Order Items</h3>
                       ${items.map((item) => {
-                        const sizeLabel = item.bandSize && item.cupSize 
-                          ? `${item.bandSize} ${item.cupSize}`.trim()
-                          : item.size || ''
-                        
-                        // Build image URL using helper function
-                        const imageUrl = buildProductImageUrl(item.image)
-                        
-                        return `
+        const sizeLabel = item.bandSize && item.cupSize
+          ? `${item.bandSize} ${item.cupSize}`.trim()
+          : item.size || ''
+
+        // Build image URL using helper function
+        const imageUrl = buildProductImageUrl(item.image)
+
+        return `
                         <div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-bottom: 12px;">
                           <table width="100%" cellpadding="0" cellspacing="0">
                             <tr>
@@ -270,7 +271,7 @@ export async function sendAdminOrderNotificationEmail(
                           </table>
                         </div>
                         `
-                      }).join('')}
+      }).join('')}
                       
                       <!-- Shipping Address -->
                       <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 30px 0;">
@@ -326,7 +327,7 @@ export async function sendOrderStatusUpdateEmail(
       'CANCELLED': '#ef4444',
     }
     const statusColor = statusColors[status.toUpperCase()] || STORE_COLOR
-    
+
     await transporter.sendMail({
       from: process.env.SMTP_FROM || process.env.SMTP_USER,
       to: email,
@@ -345,7 +346,7 @@ export async function sendOrderStatusUpdateEmail(
                 <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                   <!-- Header -->
                   <tr>
-                    <td style="background: linear-gradient(135deg, ${STORE_COLOR} 0%, #d946ef 100%); padding: 30px; text-align: center;">
+                    <td style="background: linear-gradient(135deg, #ec4899 0%, #9333ea 100%); padding: 30px; text-align: center;">
                       <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: bold; letter-spacing: 2px;">${STORE_NAME}</h1>
                     </td>
                   </tr>
@@ -371,10 +372,10 @@ export async function sendOrderStatusUpdateEmail(
                       <!-- Order Items -->
                       <h3 style="color: #333333; font-size: 20px; margin: 30px 0 20px 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Order Items</h3>
                       ${items.map((item) => {
-                        // Build image URL using helper function
-                        const imageUrl = buildProductImageUrl(item.image)
-                        
-                        return `
+        // Build image URL using helper function
+        const imageUrl = buildProductImageUrl(item.image)
+
+        return `
                         <div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 15px;">
                           <table width="100%" cellpadding="0" cellspacing="0">
                             <tr>
@@ -394,7 +395,7 @@ export async function sendOrderStatusUpdateEmail(
                           </table>
                         </div>
                         `
-                      }).join('')}
+      }).join('')}
                       
                       <!-- Shipping Address -->
                       <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 30px 0;">
@@ -451,9 +452,9 @@ export async function sendOTPEmail(email: string, otp: string) {
             <tr>
               <td align="center">
                 <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                  <!-- Header -->
+                  <!-- Header with Store Name -->
                   <tr>
-                    <td style="background: linear-gradient(135deg, ${STORE_COLOR} 0%, #d946ef 100%); padding: 30px; text-align: center;">
+                    <td style="background: linear-gradient(135deg, #ec4899 0%, #9333ea 100%); padding: 30px; text-align: center;">
                       <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: bold; letter-spacing: 2px;">${STORE_NAME}</h1>
                       <p style="color: #ffffff; margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">Elegant Fashion & Beauty</p>
                     </td>

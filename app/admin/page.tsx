@@ -314,6 +314,12 @@ export default function AdminPage() {
         >
           📦 View Orders →
         </Link>
+        <Link
+          href="/admin/coupons"
+          className="text-primary-600 hover:underline"
+        >
+          🎟️ Manage Coupons →
+        </Link>
       </div>
 
       <div className="bg-white p-4 rounded-lg shadow-sm mb-6 space-y-4 md:space-y-0 md:flex md:flex-wrap md:gap-4 md:items-center">

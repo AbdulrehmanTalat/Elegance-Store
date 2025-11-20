@@ -46,6 +46,16 @@
 - **Secure Password Storage**: Passwords are hashed with bcrypt
 - **OTP System**: 6-digit codes sent via email
 
+### 6. Wishlist
+- **Location**: Wishlist Page (`/wishlist`)
+- **Features**:
+  - Heart icon on product cards to add/remove items
+  - Dedicated wishlist page to view all saved items
+  - Quick add to cart from wishlist
+  - Wishlist count badge in navbar
+  - Works with product variants (color, size)
+  - Authentication required
+
 ## 📋 API Endpoints
 
 ### Admin
@@ -58,6 +68,12 @@
 
 ### Orders
 - `POST /api/orders/reorder` - Reorder items from a previous order
+
+### Wishlist
+- `GET /api/wishlist` - Get user's wishlist items
+- `POST /api/wishlist` - Add item to wishlist
+- `DELETE /api/wishlist` - Remove item from wishlist
+- `GET /api/wishlist/check` - Check if item is in wishlist
 
 ## 🗄️ Database Changes
 

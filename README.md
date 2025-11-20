@@ -6,6 +6,7 @@ A modern, full-featured e-commerce website built with Next.js 14 for selling lad
 
 - 🛍️ **Product Catalog**: Browse products by category (Undergarments, Jewelry, Makeup)
 - 🛒 **Shopping Cart**: Add items to cart and manage quantities
+- ❤️ **Wishlist**: Save favorite items for later with quick access
 - 💳 **Payment Integration**: Online payment via Stripe and Cash on Delivery (COD)
 - 📧 **Email Notifications**: Order confirmation and status update emails
 - 👤 **User Authentication**: Secure sign up and sign in
@@ -104,7 +105,8 @@ ecommerce-store/
 │   ├── checkout/          # Checkout page
 │   ├── orders/            # Order pages
 │   ├── products/          # Product pages
-│   └── profile/            # User profile page
+│   ├── profile/            # User profile page
+│   └── wishlist/          # Wishlist page
 ├── components/            # React components
 ├── lib/                   # Utility functions
 ├── prisma/                # Prisma schema

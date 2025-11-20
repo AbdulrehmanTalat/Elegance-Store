@@ -1,46 +1,74 @@
 'use client'
 
 import { useState } from 'react'
-import type { Metadata } from 'next'
-import { Mail, Phone, MessageCircle, MapPin, Clock, Send } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { Mail, Phone, MessageCircle, MapPin, Clock, Send, User } from 'lucide-react'
+
+const contactSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email address'),
+  subject: z.string().min(5, 'Subject must be at least 5 characters'),
+  message: z.string().min(10, 'Message must be at least 10 characters'),
+})
+
+type ContactFormData = z.infer<typeof contactSchema>
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [error, setError] = useState('')
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ContactFormData>({
+    resolver: zodResolver(contactSchema),
   })
-  const [submitting, setSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSubmitting(true)
-    
-    // Simulate form submission (you can integrate with your email API)
-    setTimeout(() => {
-      setSubmitting(false)
-      setSubmitted(true)
-      setFormData({ name: '', email: '', subject: '', message: '' })
-      setTimeout(() => setSubmitted(false), 5000)
-    }, 1000)
-  }
+  const onSubmit = async (data: ContactFormData) => {
+    setIsSubmitting(true)
+    setError('')
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to send message')
+      }
+
+      setIsSuccess(true)
+      reset()
+      
+      setTimeout(() => setIsSuccess(false), 5000)
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const contactEmail = 'htesting22@gmail.com'
-  const whatsappNumber = '+923001234567' // Replace with actual WhatsApp number
+  const whatsappNumber = '+923001234567'
   const phone = '+92 300 1234567'
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Get In Touch</h1>
+          <h1 className="text-5xl font-bold mb-4">
+            <span className="text-gradient">Get In Touch</span>
+          </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Have a question? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
           </p>
@@ -48,82 +76,99 @@ export default function ContactPage() {
 
         <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {/* Contact Form */}
-          <div className="bg-white rounded-2xl shadow-lg p-8">
+          <div className="glass-white rounded-2xl shadow-xl p-8">
             <h2 className="text-2xl font-bold mb-6">Send us a Message</h2>
             
-            {submitted && (
-              <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6">
-                ✅ Thank you! Your message has been sent successfully.
+            {isSuccess && (
+              <div className="bg-green-50 border-2 border-green-500 text-green-800 px-4 py-3 rounded-xl mb-6 animate-fade-in-up">
+                ✅ Thank you! Your message has been sent successfully. We'll get back to you soon.
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div className="bg-red-50 border-2 border-red-500 text-red-700 px-4 py-3 rounded-xl mb-6 animate-fade-in-up">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Your Name *
                 </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="John Doe"
-                />
+                <div className="relative">
+                  <User size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    {...register('name')}
+                    type="text"
+                    placeholder="John Doe"
+                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none transition-all"
+                  />
+                </div>
+                {errors.name && (
+                  <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+                )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Your Email *
                 </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="john@example.com"
-                />
+                <div className="relative">
+                  <Mail size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <input
+                    {...register('email')}
+                    type="email"
+                    placeholder="john@example.com"
+                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none transition-all"
+                  />
+                </div>
+                {errors.email && (
+                  <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Subject *
                 </label>
                 <input
+                  {...register('subject')}
                   type="text"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="How can we help?"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none transition-all"
                 />
+                {errors.subject && (
+                  <p className="text-red-500 text-sm mt-1">{errors.subject.message}</p>
+                )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Message *
                 </label>
                 <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  required
+                  {...register('message')}
                   rows={5}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
                   placeholder="Tell us more about your inquiry..."
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-pink-500 focus:ring-2 focus:ring-pink-200 outline-none transition-all resize-none"
                 />
+                {errors.message && (
+                  <p className="text-red-500 text-sm mt-1">{errors.message.message}</p>
+                )}
               </div>
 
               <button
                 type="submit"
-                disabled={submitting}
-                className="w-full bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition font-medium flex items-center justify-center gap-2 disabled:bg-gray-400"
+                disabled={isSubmitting}
+                className="w-full py-4 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-xl font-bold hover:scale-105 transition-all duration-300 shadow-xl hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
               >
-                {submitting ? 'Sending...' : (
+                {isSubmitting ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Sending...
+                  </>
+                ) : (
                   <>
                     <Send size={20} />
                     Send Message

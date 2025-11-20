@@ -4,7 +4,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ShoppingCart, Heart, Star, Eye } from 'lucide-react'
 import { useCartStore } from '@/store/cart-store'
-import { useState } from 'react'
+import { useSession } from 'next-auth/react'
+import { useToast } from '@/components/ToastProvider'
+import { useState, useEffect } from 'react'
 
 interface ProductCardProps {
   product: {
@@ -29,6 +31,52 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem)
   const [isHovered, setIsHovered] = useState(false)
+  const [isInWishlist, setIsInWishlist] = useState(false)
+  const { data: session } = useSession()
+  const { showSuccess, showError } = useToast()
+
+  useEffect(() => {
+    if (session?.user) {
+      fetch(`/api/wishlist/check?productId=${product.id}`)
+        .then(res => res.json())
+        .then(data => setIsInWishlist(data.isInWishlist))
+        .catch(console.error)
+    }
+  }, [session, product.id])
+
+  const toggleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (!session) {
+      window.location.href = `/auth/signin?callbackUrl=/products/${product.id}`
+      return
+    }
+
+    try {
+      if (isInWishlist) {
+        const res = await fetch(`/api/wishlist?productId=${product.id}`, {
+          method: 'DELETE',
+        })
+        if (res.ok) {
+          setIsInWishlist(false)
+          showSuccess('Removed from wishlist')
+        }
+      } else {
+        const res = await fetch('/api/wishlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId: product.id }),
+        })
+        if (res.ok) {
+          setIsInWishlist(true)
+          showSuccess('Added to wishlist')
+        }
+      }
+    } catch (error) {
+      showError('Failed to update wishlist')
+    }
+  }
 
   // Calculate price display
   const hasVariants = product.colors && product.colors.length > 0
@@ -100,6 +148,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         image: displayImage || '',
         quantity: 1,
         productId: product.id,
+        category: (product as any).category,
       })
     }
   }
@@ -161,13 +210,12 @@ export default function ProductCard({ product }: ProductCardProps) {
           {/* Wishlist Button */}
           <button 
             className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-white transition-all duration-200 opacity-0 group-hover:opacity-100 transform group-hover:scale-110"
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              // Wishlist functionality to be implemented
-            }}
+            onClick={toggleWishlist}
           >
-            <Heart size={20} className="text-gray-700 hover:text-red-500 transition" />
+            <Heart 
+              size={20} 
+              className={`transition ${isInWishlist ? 'fill-red-500 text-red-500' : 'text-gray-700 hover:text-red-500'}`} 
+            />
           </button>
 
           {/* Quick View Overlay */}

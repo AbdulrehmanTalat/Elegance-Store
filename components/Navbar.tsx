@@ -2,14 +2,26 @@
 
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
-import { ShoppingCart, User, Menu } from 'lucide-react'
+import { ShoppingCart, User, Menu, Heart } from 'lucide-react'
 import { useCartStore } from '@/store/cart-store'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function Navbar() {
   const { data: session } = useSession()
   const itemCount = useCartStore((state) => state.getItemCount())
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [wishlistCount, setWishlistCount] = useState(0)
+
+  useEffect(() => {
+    if (session?.user) {
+      fetch('/api/wishlist')
+        .then(res => res.ok ? res.json() : [])
+        .then(data => setWishlistCount(Array.isArray(data) ? data.length : 0))
+        .catch(() => setWishlistCount(0))
+    } else {
+      setWishlistCount(0)
+    }
+  }, [session])
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
@@ -26,6 +38,20 @@ export default function Navbar() {
             {session?.user?.role === 'ADMIN' && (
               <Link href="/admin" className="hover:text-primary-600 transition">
                 Admin
+              </Link>
+            )}
+            {session && (
+              <Link
+                href="/wishlist"
+                className="relative hover:text-primary-600 transition"
+                title="Wishlist"
+              >
+                <Heart size={24} />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {wishlistCount}
+                  </span>
+                )}
               </Link>
             )}
             <Link
@@ -89,6 +115,16 @@ export default function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Admin
+              </Link>
+            )}
+            {session && (
+              <Link
+                href="/wishlist"
+                className="flex items-center space-x-2 hover:text-primary-600 transition"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Heart size={20} />
+                <span>Wishlist ({wishlistCount})</span>
               </Link>
             )}
             <Link

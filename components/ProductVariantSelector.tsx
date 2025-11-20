@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ShoppingCart } from 'lucide-react'
+import { ShoppingCart, Heart } from 'lucide-react'
 import { useCartStore } from '@/store/cart-store'
 import { useToast } from '@/components/ToastProvider'
 import Image from 'next/image'
+import { useSession } from 'next-auth/react'
 
 interface Color {
   id: string
@@ -26,6 +27,7 @@ interface Variant {
 interface ProductVariantSelectorProps {
   productId: string
   productName: string
+  productCategory: string
   colors: Color[]
   variants: Variant[]
   basePrice?: number | null
@@ -35,13 +37,16 @@ interface ProductVariantSelectorProps {
 export default function ProductVariantSelector({
   productId,
   productName,
+  productCategory,
   colors,
   variants,
   basePrice,
   onColorChange,
 }: ProductVariantSelectorProps) {
   const addItem = useCartStore((state) => state.addItem)
-  const { showSuccess, showWarning } = useToast()
+  const { showSuccess, showWarning, showError } = useToast()
+  const { data: session } = useSession()
+  const [isInWishlist, setIsInWishlist] = useState(false)
   const [selectedColor, setSelectedColor] = useState<Color | null>(colors[0] || null)
   const [selectedBandSize, setSelectedBandSize] = useState<string>('')
   const [selectedCupSize, setSelectedCupSize] = useState<string>('')
@@ -128,6 +133,54 @@ export default function ProductVariantSelector({
     }))
   }
 
+  // Check wishlist status
+  useEffect(() => {
+    if (session?.user) {
+      // For now, we just check the product ID. 
+      // Ideally we could check for specific variants if one is selected, 
+      // but the UI has a single wishlist button.
+      fetch(`/api/wishlist/check?productId=${productId}`)
+        .then(res => res.json())
+        .then(data => setIsInWishlist(data.isInWishlist))
+        .catch(console.error)
+    }
+  }, [session, productId])
+
+  const toggleWishlist = async () => {
+    if (!session) {
+      window.location.href = `/auth/signin?callbackUrl=/products/${productId}`
+      return
+    }
+
+    try {
+      if (isInWishlist) {
+        const res = await fetch(`/api/wishlist?productId=${productId}`, {
+          method: 'DELETE',
+        })
+        if (res.ok) {
+          setIsInWishlist(false)
+          showSuccess('Removed from wishlist')
+        }
+      } else {
+        // We add the product ID. 
+        // If we wanted to add a specific variant, we'd need to determine which one is "active".
+        // Since this selector allows multiple quantities, it's ambiguous.
+        // So we just add the product.
+        const res = await fetch('/api/wishlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId }),
+        })
+        if (res.ok) {
+          setIsInWishlist(true)
+          showSuccess('Added to wishlist')
+        }
+      }
+    } catch (error) {
+      showError('Failed to update wishlist')
+    }
+  }
+
   const handleAddToCart = () => {
     let added = false
     for (const [variantId, quantity] of Object.entries(quantities)) {
@@ -146,6 +199,7 @@ export default function ProductVariantSelector({
             quantity,
             variantId: variant.id,
             productId: productId,
+            category: productCategory,
           })
           added = true
         }
@@ -403,18 +457,32 @@ export default function ProductVariantSelector({
       )}
 
       {/* Add to Cart Button */}
-      <button
-        onClick={handleAddToCart}
-        disabled={!hasSelection}
-        className="w-full bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-lg"
-      >
-        <ShoppingCart size={24} />
-        <span>
-          {hasSelection
-            ? `Add ${totalQuantity} item${totalQuantity > 1 ? 's' : ''} to Cart`
-            : 'Select sizes and quantities'}
-        </span>
-      </button>
+      <div className="flex gap-3">
+        <button
+          onClick={handleAddToCart}
+          disabled={!hasSelection}
+          className="flex-1 bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-lg"
+        >
+          <ShoppingCart size={24} />
+          <span>
+            {hasSelection
+              ? `Add ${totalQuantity} item${totalQuantity > 1 ? 's' : ''} to Cart`
+              : 'Select sizes and quantities'}
+          </span>
+        </button>
+
+        <button
+          onClick={toggleWishlist}
+          className={`px-4 py-3 rounded-lg border-2 transition flex items-center justify-center ${
+            isInWishlist 
+              ? 'border-red-200 bg-red-50 text-red-500' 
+              : 'border-gray-300 hover:border-gray-400 text-gray-600'
+          }`}
+          title={isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+        >
+          <Heart size={24} className={isInWishlist ? "fill-current" : ""} />
+        </button>
+      </div>
     </div>
   )
 }

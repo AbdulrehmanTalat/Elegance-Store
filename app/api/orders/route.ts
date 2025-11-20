@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json()
-    const { items, shippingAddress, phone, paymentMethod } = body
+    const { items, shippingAddress, phone, paymentMethod, couponId, discountAmount } = body
 
     if (!items || items.length === 0) {
       return NextResponse.json(
@@ -61,11 +61,16 @@ export async function POST(req: NextRequest) {
       totalAmount += item.price * item.quantity
     }
 
+    // Apply discount
+    const finalTotalAmount = totalAmount - (discountAmount || 0)
+
     // Create order
     const order = await prisma.order.create({
       data: {
         userId: session.user.id,
-        totalAmount,
+        totalAmount: finalTotalAmount,
+        discountAmount: discountAmount || 0,
+        couponId: couponId || null,
         paymentMethod,
         paymentStatus: paymentMethod === 'COD' ? 'PENDING' : 'PENDING',
         shippingAddress,
@@ -113,20 +118,40 @@ export async function POST(req: NextRequest) {
       },
     })
 
+    // Create coupon usage record if coupon was applied
+    if (couponId && discountAmount > 0) {
+      await prisma.couponUsage.create({
+        data: {
+          couponId,
+          userId: session.user.id,
+          orderId: order.id,
+          discount: discountAmount,
+        },
+      })
+
+      // Increment coupon usage count
+      await prisma.coupon.update({
+        where: { id: couponId },
+        data: {
+          usageCount: { increment: 1 },
+        },
+      })
+    }
+
     // Note: Stock will be decremented when order is confirmed (not at creation)
     // This prevents stock issues if order is cancelled or payment fails
 
     // Prepare order items for email
     const emailItems = order.items.map((item) => {
       let image: string | null = null
-      
+
       // Get image from variant color or product
       if (item.variant?.color?.images && item.variant.color.images.length > 0) {
         image = item.variant.color.images[0]
       } else if (item.product.image) {
         image = item.product.image
       }
-      
+
       // Return base product name (variant info will be shown separately in email)
       return {
         productName: item.product.name, // Base product name only
@@ -144,11 +169,12 @@ export async function POST(req: NextRequest) {
     await sendOrderConfirmationEmail(
       session.user.email!,
       order.id,
-      totalAmount,
+      finalTotalAmount,
       shippingAddress,
       phone,
       emailItems,
-      order.createdAt
+      order.createdAt,
+      discountAmount || 0
     )
 
     // Get admin emails and send notification

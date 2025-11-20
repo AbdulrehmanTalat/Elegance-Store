@@ -82,6 +82,7 @@ export default function ProductDetails({
           <ProductVariantSelector
             productId={productId}
             productName={productName}
+            productCategory={category}
             colors={colors}
             variants={variants}
             basePrice={basePrice}

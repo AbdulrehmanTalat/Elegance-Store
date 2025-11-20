@@ -10,6 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import Image from 'next/image'
 import { pakistanProvinces, sortedPakistanCities } from '@/lib/pakistan-data'
+import CouponInput from '@/components/CouponInput'
 import { 
   ShoppingBag, 
   MapPin, 
@@ -42,6 +43,8 @@ export default function CheckoutPage() {
   const clearCart = useCartStore((state) => state.clearCart)
   const [loading, setLoading] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null)
+  const [discount, setDiscount] = useState<any>(null)
 
   const {
     register,
@@ -56,6 +59,16 @@ export default function CheckoutPage() {
   })
 
   const paymentMethod = watch('paymentMethod')
+
+  const handleCouponApplied = (coupon: any, discountData: any) => {
+    setAppliedCoupon(coupon)
+    setDiscount(discountData)
+  }
+
+  const handleCouponRemoved = () => {
+    setAppliedCoupon(null)
+    setDiscount(null)
+  }
 
   if (status === 'loading') {
     return (
@@ -121,6 +134,8 @@ export default function CheckoutPage() {
           shippingAddress: shippingAddress,
           phone: data.phone,
           paymentMethod: data.paymentMethod,
+          couponId: appliedCoupon?.id,
+          discountAmount: discount?.amount || 0,
         }),
       })
 
@@ -170,7 +185,8 @@ export default function CheckoutPage() {
   const total = getTotal()
   const shipping = 0
   const tax = 0
-  const grandTotal = total + shipping + tax
+  const discountAmount = discount?.amount || 0
+  const grandTotal = total + shipping + tax - discountAmount
 
   const steps = [
     { number: 1, title: 'Shipping', icon: MapPin },
@@ -473,6 +489,19 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
+              {/* Coupon Section */}
+              <div className="mb-4">
+                <CouponInput
+                  onCouponApplied={handleCouponApplied}
+                  onCouponRemoved={handleCouponRemoved}
+                  cartTotal={total}
+                  cartItems={items.map(item => ({
+                    productId: item.productId || item.id.split('-')[0],
+                    category: item.category || 'UNDERGARMENTS',
+                  }))}
+                />
+              </div>
+
               {/* Totals */}
               <div className="space-y-3 pt-4 border-t-2">
                 <div className="flex justify-between text-gray-600">
@@ -485,6 +514,14 @@ export default function CheckoutPage() {
                   </span>
                   <span className="font-semibold text-green-600">Free</span>
                 </div>
+                {discountAmount > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span className="flex items-center gap-1">
+                      🎟️ Coupon Discount
+                    </span>
+                    <span className="font-semibold">- Rs {discountAmount.toFixed(2)}</span>
+                  </div>
+                )}
                 {tax > 0 && (
                   <div className="flex justify-between text-gray-600">
                     <span>Tax</span>

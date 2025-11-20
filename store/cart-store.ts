@@ -8,6 +8,7 @@ interface CartItem {
   quantity: number
   variantId?: string
   productId?: string
+  category?: string
 }
 
 interface CartStore {

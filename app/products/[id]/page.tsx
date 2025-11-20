@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import ProductDetails from '@/components/ProductDetails'
+import ProductReviews from '@/components/reviews/ProductReviews'
 
 async function getProduct(id: string) {
   try {
@@ -59,6 +60,12 @@ export default async function ProductPage({
         colors={product.colors || []}
         variants={allVariants}
         product={hasVariants ? undefined : product}
+      />
+      
+      <ProductReviews 
+        productId={product.id}
+        avgRating={product.avgRating || 0}
+        reviewCount={product.reviewCount || 0}
       />
     </div>
   )
