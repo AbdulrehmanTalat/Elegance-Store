@@ -46,9 +46,9 @@ export default function Navbar() {
             <Link href="/about" className="hover:text-primary-600 transition">
               About
             </Link>
-            {session?.user?.role === 'ADMIN' && (
-              <Link href="/admin" className="hover:text-primary-600 transition">
-                Admin
+            {(session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN') && (
+              <Link href="/admin/dashboard" className="hover:text-primary-600 transition font-semibold">
+                Admin Panel
               </Link>
             )}
             {session && (
@@ -79,7 +79,7 @@ export default function Navbar() {
             {session ? (
               <div className="flex items-center space-x-4">
                 <Link
-                  href={session.user?.role === 'ADMIN' ? '/admin' : '/profile'}
+                  href={(session.user?.role === 'ADMIN' || session.user?.role === 'SUPER_ADMIN') ? '/admin/dashboard' : '/profile'}
                   className="flex items-center space-x-1 hover:text-primary-600 transition cursor-pointer"
                 >
                   <User size={20} />
@@ -136,13 +136,13 @@ export default function Navbar() {
             >
               About
             </Link>
-            {session?.user?.role === 'ADMIN' && (
+            {(session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN') && (
               <Link
-                href="/admin"
-                className="block hover:text-primary-600 transition"
+                href="/admin/dashboard"
+                className="block hover:text-primary-600 transition font-semibold"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Admin
+                Admin Panel
               </Link>
             )}
             {session && (
@@ -166,7 +166,7 @@ export default function Navbar() {
             {session ? (
               <div className="space-y-2">
                 <Link
-                  href={session.user?.role === 'ADMIN' ? '/admin' : '/profile'}
+                  href={(session.user?.role === 'ADMIN' || session.user?.role === 'SUPER_ADMIN') ? '/admin/dashboard' : '/profile'}
                   className="flex items-center space-x-2 hover:text-primary-600 transition cursor-pointer"
                   onClick={() => setMobileMenuOpen(false)}
                 >
