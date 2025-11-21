@@ -38,6 +38,9 @@ export default function Navbar() {
             <Link href="/blog" className="hover:text-primary-600 transition">
               Blog
             </Link>
+            <Link href="/about" className="hover:text-primary-600 transition">
+              About
+            </Link>
             {session?.user?.role === 'ADMIN' && (
               <Link href="/admin" className="hover:text-primary-600 transition">
                 Admin
@@ -117,6 +120,13 @@ export default function Navbar() {
               onClick={() => setMobileMenuOpen(false)}
             >
               Blog
+            </Link>
+            <Link
+              href="/about"
+              className="block hover:text-primary-600 transition"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              About
             </Link>
             {session?.user?.role === 'ADMIN' && (
               <Link
