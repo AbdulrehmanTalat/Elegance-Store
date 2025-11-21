@@ -16,6 +16,7 @@ import {
   Download,
   Share2
 } from 'lucide-react'
+import OrderTracker from './OrderTracker'
 
 export default function OrderDetails({
   order,
@@ -185,38 +186,7 @@ export default function OrderDetails({
               </div>
 
               {/* Progress Timeline */}
-              <div className="relative">
-                <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200"></div>
-                {[
-                  { label: 'Order Placed', date: order.createdAt, active: true },
-                  { label: 'Confirmed', date: order.updatedAt, active: ['CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED'].includes(order.status) },
-                  { label: 'Processing', date: null, active: ['PROCESSING', 'SHIPPED', 'DELIVERED'].includes(order.status) },
-                  { label: 'Shipped', date: null, active: ['SHIPPED', 'DELIVERED'].includes(order.status) },
-                  { label: 'Delivered', date: null, active: order.status === 'DELIVERED' },
-                ].map((step, index) => (
-                  <div key={index} className="relative flex items-start gap-4 mb-6 last:mb-0">
-                    <div className={`relative z-10 w-12 h-12 rounded-full flex items-center justify-center border-4 ${
-                      step.active ? 'bg-primary-600 border-primary-600' : 'bg-white border-gray-300'
-                    }`}>
-                      {step.active ? (
-                        <CheckCircle className="text-white" size={20} />
-                      ) : (
-                        <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                      )}
-                    </div>
-                    <div className="flex-1 pt-2">
-                      <p className={`font-semibold ${step.active ? 'text-gray-900' : 'text-gray-400'}`}>
-                        {step.label}
-                      </p>
-                      {step.date && (
-                        <p className="text-sm text-gray-500">
-                          {new Date(step.date).toLocaleDateString()}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <OrderTracker status={order.status} createdAt={order.createdAt} />
             </div>
 
             {/*  Order Items Card */}

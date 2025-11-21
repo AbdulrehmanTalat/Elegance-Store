@@ -63,7 +63,7 @@ export default function ProductActions({ product }: ProductActionsProps) {
     const image = (product as any).image || ''
     const stock = (product as any).stock || 0
     
-    if (stock > 0 || price > 0) {
+    if (stock > 0 && price > 0) {
       addItem({
         id: product.id,
         name: product.name,
@@ -75,8 +75,13 @@ export default function ProductActions({ product }: ProductActionsProps) {
       })
       setQuantity(1)
       showSuccess('Item added to cart!')
+    } else if (stock === 0) {
+      showError('This item is out of stock')
     }
   }
+
+  const stock = (product as any).stock || 0
+  const isOutOfStock = stock === 0
 
   return (
     <div>
@@ -96,10 +101,11 @@ export default function ProductActions({ product }: ProductActionsProps) {
       <div className="flex gap-3">
         <button
           onClick={handleAddToCart}
+          disabled={isOutOfStock}
           className="flex-1 bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-lg"
         >
           <ShoppingCart size={24} />
-          <span>Add to Cart</span>
+          <span>{isOutOfStock ? 'Out of Stock' : 'Add to Cart'}</span>
         </button>
         
         <button

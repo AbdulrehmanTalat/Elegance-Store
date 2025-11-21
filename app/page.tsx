@@ -6,6 +6,8 @@ import FeatureCard from '@/components/home/FeatureCard'
 import NewsletterSection from '@/components/home/NewsletterSection'
 import PopularProducts from '@/components/PopularProducts'
 import JsonLd from '@/components/JsonLd'
+import Testimonials from '@/components/home/Testimonials'
+import RecentlyViewed from '@/components/RecentlyViewed'
 
 export const dynamic = 'force-dynamic'
 
@@ -253,6 +255,9 @@ export default async function Home() {
       {/* Popular Products */}
       <PopularProducts />
 
+      {/* Recently Viewed */}
+      <RecentlyViewed />
+
       {/* Why Choose Us */}
       <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100">
         <div className="container mx-auto px-4">
@@ -278,6 +283,9 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* Customer Testimonials */}
+      <Testimonials />
 
       {/* Newsletter */}
       <NewsletterSection />

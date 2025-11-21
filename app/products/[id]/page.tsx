@@ -6,6 +6,8 @@ import ProductReviews from '@/components/reviews/ProductReviews'
 import JsonLd from '@/components/JsonLd'
 import Breadcrumbs from '@/components/Breadcrumbs'
 import RelatedProducts from '@/components/RelatedProducts'
+import ProductViewTracker from '@/components/products/ProductViewTracker'
+import RecentlyViewed from '@/components/RecentlyViewed'
 
 async function getProduct(id: string) {
   try {
@@ -336,6 +338,17 @@ export default async function ProductPage({
         category={product.category}
         currentProductId={product.id}
         subcategory={product.subcategory}
+      />
+
+      <RecentlyViewed />
+
+      <ProductViewTracker 
+        product={{
+          id: product.id,
+          name: product.name,
+          image: product.image || (product.colors?.[0]?.images?.[0] ?? null),
+          basePrice: product.basePrice
+        }}
       />
     </div>
   )

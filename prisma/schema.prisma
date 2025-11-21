@@ -52,6 +52,15 @@ model User {
   zipCode       String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  
+  // Email Preferences
+  emailOrderConfirmation    Boolean  @default(true)
+  emailShippingUpdates      Boolean  @default(true)
+  emailOrderStatus          Boolean  @default(true)
+  emailMarketing            Boolean  @default(false)
+  emailAccountUpdates       Boolean  @default(true)
+  emailPreferencesUpdatedAt DateTime @default(now())
+  
   orders        Order[]
   cartItems     CartItem[]
   accounts      Account[]

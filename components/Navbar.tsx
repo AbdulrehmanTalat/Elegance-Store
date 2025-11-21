@@ -5,6 +5,7 @@ import { useSession, signOut } from 'next-auth/react'
 import { ShoppingCart, User, Menu, Heart } from 'lucide-react'
 import { useCartStore } from '@/store/cart-store'
 import { useState, useEffect } from 'react'
+import SearchAutocomplete from './SearchAutocomplete'
 
 export default function Navbar() {
   const { data: session } = useSession()
@@ -27,9 +28,13 @@ export default function Navbar() {
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
-          <Link href="/" className="text-2xl font-bold text-primary-600">
+          <Link href="/" className="text-2xl font-bold text-primary-600 flex-shrink-0">
             Elegance Store
           </Link>
+
+          <div className="hidden md:block flex-1 max-w-md mx-8">
+            <SearchAutocomplete />
+          </div>
 
           <div className="hidden md:flex items-center space-x-6">
             <Link href="/products" className="hover:text-primary-600 transition">
@@ -107,6 +112,9 @@ export default function Navbar() {
 
         {mobileMenuOpen && (
           <div className="md:hidden py-4 space-y-4">
+            <div className="px-2 mb-4">
+              <SearchAutocomplete />
+            </div>
             <Link
               href="/products"
               className="block hover:text-primary-600 transition"

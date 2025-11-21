@@ -7,6 +7,7 @@ import { useCartStore } from '@/store/cart-store'
 import { useSession } from 'next-auth/react'
 import { useToast } from '@/components/ToastProvider'
 import { useState, useEffect } from 'react'
+import QuickViewModal from './QuickViewModal'
 
 interface ProductCardProps {
   product: {
@@ -18,8 +19,13 @@ interface ProductCardProps {
     avgRating?: number | null
     reviewCount?: number
     colors?: Array<{
+      name: string
       images: string[]
       variants?: Array<{
+        id: string
+        size: string | null
+        bandSize?: string | null
+        cupSize?: string | null
         price: number
         stock: number
       }>
@@ -33,6 +39,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false)
   const [isInWishlist, setIsInWishlist] = useState(false)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const [showQuickView, setShowQuickView] = useState(false)
   const { data: session } = useSession()
   const { showSuccess, showError } = useToast()
 
@@ -227,12 +234,16 @@ export default function ProductCard({ product }: ProductCardProps) {
           </button>
 
           {/* Quick View Overlay */}
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-            <span className="text-white font-semibold flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-              <Eye size={20} />
-              Quick View
-            </span>
-          </div>
+          <button
+            onClick={(e) => {
+              e.preventDefault()
+              setShowQuickView(true)
+            }}
+            className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center text-white font-semibold gap-2"
+          >
+            <Eye size={20} />
+            Quick View
+          </button>
         </div>
       </Link>
 
@@ -276,16 +287,19 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
           
           <button
-            onClick={handleAddToCart}
-            disabled={isOutOfStock}
-            className="bg-primary-600 text-white px-5 py-2.5 rounded-xl hover:bg-primary-700 transition-all duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95"
+            onClick={isOutOfStock ? () => window.location.href = `/products/${product.id}` : handleAddToCart}
+            className={`px-5 py-2.5 rounded-xl transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 ${
+              isOutOfStock 
+                ? 'bg-gray-100 text-gray-600 hover:bg-gray-200' 
+                : 'bg-primary-600 text-white hover:bg-primary-700'
+            }`}
           >
-            <ShoppingCart size={18} />
+            {isOutOfStock ? <Eye size={18} /> : <ShoppingCart size={18} />}
             <span className="font-medium">
               {hasVariantsWithData 
                 ? 'Options' 
                 : isOutOfStock 
-                  ? 'Sold Out' 
+                  ? 'View Details' 
                   : 'Add'}
             </span>
           </button>
@@ -333,6 +347,11 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
       </div>
+      <QuickViewModal 
+        isOpen={showQuickView}
+        onClose={() => setShowQuickView(false)}
+        product={product as any}
+      />
     </div>
   )
 }

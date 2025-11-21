@@ -219,6 +219,15 @@ export default function CartPage() {
                   </span>
                 </div>
 
+                <div className="flex justify-between text-gray-700">
+                  <span className="flex items-center gap-1">
+                    Estimated Delivery
+                  </span>
+                  <span className="font-semibold text-gray-900">
+                    3-5 Business Days
+                  </span>
+                </div>
+
                 {tax > 0 && (
                   <div className="flex justify-between text-gray-700">
                     <span>Tax</span>

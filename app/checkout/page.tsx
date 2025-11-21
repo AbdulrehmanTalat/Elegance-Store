@@ -514,6 +514,13 @@ export default function CheckoutPage() {
                   </span>
                   <span className="font-semibold text-green-600">Free</span>
                 </div>
+                <div className="flex justify-between text-gray-600">
+                  <span className="flex items-center gap-1">
+                    <Truck size={16} /> Estimated Delivery
+                  </span>
+                  <span className="font-semibold text-gray-900">3-5 Business Days</span>
+                </div>
+
                 {discountAmount > 0 && (
                   <div className="flex justify-between text-green-600">
                     <span className="flex items-center gap-1">
