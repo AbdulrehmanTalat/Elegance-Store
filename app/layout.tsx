@@ -51,6 +51,9 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  alternates: {
+    canonical: 'https://elegance-store.vercel.app',
+  },
 }
 
 export default function RootLayout({
@@ -60,8 +63,53 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
       <body className={inter.className}>
         <Providers>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'Organization',
+                name: 'Elegance Store',
+                url: 'https://elegance-store.vercel.app',
+                logo: 'https://elegance-store.vercel.app/logo.png',
+                description: 'Premium lingerie, jewelry, and makeup for women in Pakistan',
+                address: {
+                  '@type': 'PostalAddress',
+                  addressCountry: 'PK',
+                },
+                contactPoint: {
+                  '@type': 'ContactPoint',
+                  contactType: 'Customer Service',
+                  availableLanguage: ['en', 'ur'],
+                },
+              }),
+            }}
+          />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'WebSite',
+                name: 'Elegance Store',
+                url: 'https://elegance-store.vercel.app',
+                potentialAction: {
+                  '@type': 'SearchAction',
+                  target: {
+                    '@type': 'EntryPoint',
+                    urlTemplate: 'https://elegance-store.vercel.app/products?search={search_term_string}',
+                  },
+                  'query-input': 'required name=search_term_string',
+                },
+              }),
+            }}
+          />
           <Navbar />
           <main className="min-h-screen">{children}</main>
           <Footer />

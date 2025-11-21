@@ -19,6 +19,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.8,
     }))
 
+    // Get all published blog posts
+    let blogUrls: any[] = []
+    try {
+        const blogPosts = await prisma.blogPost.findMany({
+            where: { status: 'PUBLISHED' },
+            select: {
+                slug: true,
+                updatedAt: true,
+            },
+        })
+
+        blogUrls = blogPosts.map((post) => ({
+            url: `${baseUrl}/blog/${post.slug}`,
+            lastModified: post.updatedAt,
+            changeFrequency: 'weekly' as const,
+            priority: 0.7,
+        }))
+    } catch (error) {
+        // Blog table might not exist yet
+        console.log('Blog posts not available for sitemap')
+    }
+
     return [
         {
             url: baseUrl,
@@ -33,11 +55,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 0.9,
         },
         {
+            url: `${baseUrl}/blog`,
+            lastModified: new Date(),
+            changeFrequency: 'weekly',
+            priority: 0.8,
+        },
+        {
             url: `${baseUrl}/contact`,
             lastModified: new Date(),
             changeFrequency: 'monthly',
             priority: 0.5,
         },
         ...productUrls,
+        ...blogUrls,
     ]
 }
+

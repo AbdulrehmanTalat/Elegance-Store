@@ -28,11 +28,20 @@ const categoryInfo = {
 export async function generateMetadata({ searchParams }: ProductsPageProps): Promise<Metadata> {
   const category = searchParams.category as keyof typeof categoryInfo | undefined
   const search = searchParams.search
+  
+  // Base canonical URL logic
+  let canonicalUrl = 'https://elegance-store.vercel.app/products'
+  if (category) {
+    canonicalUrl += `?category=${category}`
+  }
 
   if (search) {
     return {
       title: `Search: ${search} | Elegance Store`,
       description: `Search results for "${search}". Find the best products at Elegance Store.`,
+      alternates: {
+        canonical: `${canonicalUrl}${category ? '&' : '?'}search=${encodeURIComponent(search)}`,
+      },
     }
   }
 
@@ -46,6 +55,9 @@ export async function generateMetadata({ searchParams }: ProductsPageProps): Pro
         title: `${info.title} | Elegance Store`,
         description: info.description,
       },
+      alternates: {
+        canonical: canonicalUrl,
+      },
     }
   }
 
@@ -53,6 +65,9 @@ export async function generateMetadata({ searchParams }: ProductsPageProps): Pro
     title: 'Shop All Products | Elegance Store',
     description: 'Browse our complete collection of lingerie, jewelry, and makeup. Premium quality products at affordable prices with free shipping.',
     keywords: 'online shopping, lingerie, jewelry, makeup, beauty products, fashion',
+    alternates: {
+      canonical: 'https://elegance-store.vercel.app/products',
+    },
   }
 }
 

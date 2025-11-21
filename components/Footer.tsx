@@ -32,6 +32,31 @@ export default function Footer() {
             </ul>
           </div>
           <div>
+            <h4 className="font-semibold mb-4">Quick Links</h4>
+            <ul className="space-y-2 text-gray-400">
+              <li>
+                <Link href="/products" className="hover:text-white">
+                  All Products
+                </Link>
+              </li>
+              <li>
+                <Link href="/blog" className="hover:text-white">
+                  Blog & Style Guide
+                </Link>
+              </li>
+              <li>
+                <Link href="/about" className="hover:text-white">
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/faq" className="hover:text-white">
+                  FAQ
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div>
             <h4 className="font-semibold mb-4">Customer Service</h4>
             <ul className="space-y-2 text-gray-400">
               <li>
@@ -47,6 +72,11 @@ export default function Footer() {
               <li>
                 <Link href="/returns" className="hover:text-white">
                   Returns
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy" className="hover:text-white">
+                  Privacy Policy
                 </Link>
               </li>
             </ul>

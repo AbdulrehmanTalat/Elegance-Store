@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation'
 import ProductDetails from '@/components/ProductDetails'
 import ProductReviews from '@/components/reviews/ProductReviews'
 import JsonLd from '@/components/JsonLd'
+import Breadcrumbs from '@/components/Breadcrumbs'
+import RelatedProducts from '@/components/RelatedProducts'
 
 async function getProduct(id: string) {
   try {
@@ -55,14 +57,34 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   }
 
   const displayImage = product.colors?.[0]?.images?.[0] || product.image || '/og-image.jpg'
+  const productUrl = `https://elegance-store.vercel.app/products/${params.id}`
+  
+  // Get all product images for OG tags
+  const allImages = product.colors?.flatMap(color => color.images) || [product.image].filter(Boolean)
+  const ogImages = allImages.slice(0, 4).map(img => ({
+    url: img,
+    width: 800,
+    height: 600,
+    alt: product.name,
+  }))
 
   return {
     title: `${product.name} | Elegance Store`,
     description: product.description.substring(0, 160),
+    keywords: [
+      product.name,
+      product.category.toLowerCase(),
+      product.subcategory?.toLowerCase(),
+      'pakistan',
+      'online shopping',
+      'premium quality',
+    ].filter((k): k is string => Boolean(k)),
     openGraph: {
       title: product.name,
       description: product.description.substring(0, 160),
-      images: [
+      url: productUrl,
+      type: 'website',
+      images: ogImages.length > 0 ? ogImages : [
         {
           url: displayImage,
           width: 800,
@@ -70,6 +92,15 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
           alt: product.name,
         },
       ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: product.name,
+      description: product.description.substring(0, 160),
+      images: [displayImage],
+    },
+    alternates: {
+      canonical: productUrl,
     },
   }
 }
@@ -268,6 +299,20 @@ export default async function ProductPage({
       {reviewSchemas.map((reviewSchema, index) => (
         <JsonLd key={index} data={reviewSchema} />
       ))}
+      
+      <Breadcrumbs
+        items={[
+          {
+            name: product.category.charAt(0) + product.category.slice(1).toLowerCase(),
+            href: `/products?category=${product.category}`,
+          },
+          {
+            name: product.name,
+            href: `/products/${product.id}`,
+          },
+        ]}
+      />
+      
       <ProductDetails
         productId={product.id}
         productName={product.name}
@@ -285,6 +330,12 @@ export default async function ProductPage({
         productId={product.id}
         avgRating={product.avgRating || 0}
         reviewCount={product.reviewCount || 0}
+      />
+      
+      <RelatedProducts
+        category={product.category}
+        currentProductId={product.id}
+        subcategory={product.subcategory}
       />
     </div>
   )

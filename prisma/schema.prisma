@@ -59,6 +59,7 @@ model User {
   reviews       Review[]
   wishlist      Wishlist[]
   couponUsages  CouponUsage[]
+  blogPosts     BlogPost[]
 }
 
 model Account {
@@ -301,5 +302,37 @@ model Wishlist {
   
   @@unique([userId, productId, variantId])
   @@index([userId])
+}
+
+// Blog for SEO and content marketing
+enum BlogPostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model BlogPost {
+  id              String          @id @default(cuid())
+  title           String
+  slug            String          @unique
+  excerpt         String          @db.Text
+  content         String          @db.Text
+  featuredImage   String?
+  metaTitle       String?
+  metaDescription String?
+  keywords        String[]
+  category        String          // e.g., "Style Guide", "Care Tips", "Trends"
+  authorId        String
+  status          BlogPostStatus  @default(DRAFT)
+  publishedAt     DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  
+  author User @relation(fields: [authorId], references: [id])
+  
+  @@index([slug])
+  @@index([status])
+  @@index([category])
+  @@index([publishedAt])
 }
 

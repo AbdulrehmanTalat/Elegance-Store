@@ -4,6 +4,7 @@ import HeroSection from '@/components/home/HeroSection'
 import CategoryCard from '@/components/home/CategoryCard'
 import FeatureCard from '@/components/home/FeatureCard'
 import NewsletterSection from '@/components/home/NewsletterSection'
+import PopularProducts from '@/components/PopularProducts'
 import JsonLd from '@/components/JsonLd'
 
 export const dynamic = 'force-dynamic'
@@ -219,6 +220,9 @@ export default async function Home() {
           )}
         </div>
       </section>
+
+      {/* Popular Products */}
+      <PopularProducts />
 
       {/* Why Choose Us */}
       <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100">
