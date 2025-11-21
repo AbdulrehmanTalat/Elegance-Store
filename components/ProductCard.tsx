@@ -214,14 +214,15 @@ export default function ProductCard({ product }: ProductCardProps) {
 
           </div>
 
-          {/* Wishlist Button */}
+          {/* Wishlist Button - Always Visible */}
           <button 
-            className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-2 rounded-full hover:bg-white transition-all duration-200 opacity-0 group-hover:opacity-100 transform group-hover:scale-110"
+            className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm p-2.5 rounded-full shadow-md hover:shadow-lg hover:bg-white transition-all duration-200 transform hover:scale-110"
             onClick={toggleWishlist}
+            aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
           >
             <Heart 
               size={20} 
-              className={`transition ${isInWishlist ? 'fill-red-500 text-red-500' : 'text-gray-700 hover:text-red-500'}`} 
+              className={`transition-all duration-200 ${isInWishlist ? 'fill-red-500 text-red-500' : 'text-gray-600 hover:text-red-500'}`} 
             />
           </button>
 
