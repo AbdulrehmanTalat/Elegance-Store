@@ -7,7 +7,7 @@ export default function WhatsAppButton() {
   const [isHovered, setIsHovered] = useState(false)
   
   // Replace with your actual WhatsApp business number
-  const whatsappNumber = '923001234567' // Format: country code + number (no + or spaces)
+  const whatsappNumber = '923398884625' // Format: country code + number (no + or spaces)
   const message = encodeURIComponent('Hi! I have a question about your products.')
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${message}`
 
