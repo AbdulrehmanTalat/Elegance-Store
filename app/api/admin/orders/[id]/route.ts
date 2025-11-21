@@ -25,7 +25,8 @@ export async function PUT(
 ) {
   try {
     const session = await getServerSession(authOptions)
-    if (!session?.user || session.user.role !== 'ADMIN') {
+    const userRole = (session?.user as any)?.role
+    if (!session?.user || (userRole !== 'ADMIN' && userRole !== 'SUPER_ADMIN')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -36,7 +37,7 @@ export async function PUT(
     const updateData: { status: OrderStatus; paymentStatus?: PaymentStatus } = {
       status: validatedData.status as OrderStatus,
     }
-    
+
     if (validatedData.status === 'CANCELLED') {
       updateData.paymentStatus = 'FAILED'
     }
@@ -96,7 +97,7 @@ export async function PUT(
           }
         }
       }
-      
+
       // Decrement stock when order is confirmed
       for (const item of order.items) {
         if (item.variantId) {
@@ -131,14 +132,14 @@ export async function PUT(
     // Prepare order items for email
     const emailItems = order.items.map((item) => {
       let image: string | null = null
-      
+
       // Get image from variant color or product
       if (item.variant?.color?.images && item.variant.color.images.length > 0) {
         image = item.variant.color.images[0]
       } else if (item.product.image) {
         image = item.product.image
       }
-      
+
       return {
         productName: item.product.name,
         quantity: item.quantity,
