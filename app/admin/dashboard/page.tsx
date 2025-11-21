@@ -55,7 +55,8 @@ export default function AdminDashboardPage() {
       return
     }
 
-    if (session.user?.role !== 'ADMIN') {
+    const userRole = (session.user as any)?.role
+    if (userRole !== 'ADMIN' && userRole !== 'SUPER_ADMIN') {
       router.push('/')
       return
     }

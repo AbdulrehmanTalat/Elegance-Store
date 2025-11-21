@@ -6,6 +6,7 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import WhatsAppButton from '@/components/WhatsAppButton'
 import MobileBottomNav from '@/components/MobileBottomNav'
+import ComparisonBar from '@/components/ComparisonBar'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -117,6 +118,7 @@ export default function RootLayout({
           <Footer />
           <WhatsAppButton />
           <MobileBottomNav />
+          <ComparisonBar />
         </Providers>
       </body>
     </html>

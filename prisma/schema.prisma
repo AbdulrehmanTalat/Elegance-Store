@@ -13,6 +13,7 @@ datasource db {
 enum UserRole {
   USER
   ADMIN
+  SUPER_ADMIN
 }
 
 enum OrderStatus {
@@ -69,6 +70,8 @@ model User {
   wishlist      Wishlist[]
   couponUsages  CouponUsage[]
   blogPosts     BlogPost[]
+  adminPermissions AdminPermissions?
+  auditLogs     AuditLog[]
 }
 
 model Account {
@@ -343,5 +346,58 @@ model BlogPost {
   @@index([status])
   @@index([category])
   @@index([publishedAt])
+}
+
+// Admin Permissions System
+model AdminPermissions {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Page Access
+  canAccessDashboard      Boolean @default(true)
+  canManageProducts       Boolean @default(false)
+  canManageOrders         Boolean @default(false)
+  canManageUsers          Boolean @default(false)
+  canManageCoupons        Boolean @default(false)
+  canManageAdmins         Boolean @default(false)  // Super Admin only
+  canViewAuditLogs        Boolean @default(false)  // Super Admin only
+  canManageSettings       Boolean @default(false)
+  canManageBlog           Boolean @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Audit Logging System
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  VIEW
+  LOGIN
+  LOGOUT
+  EXPORT
+  IMPORT
+}
+
+model AuditLog {
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  
+  action      AuditAction
+  entity      String      // e.g., "Product", "Order", "User", "Coupon"
+  entityId    String?     // ID of the affected entity
+  details     Json?       // Additional details about the action
+  ipAddress   String?
+  userAgent   String?
+  
+  createdAt   DateTime    @default(now())
+  
+  @@index([userId])
+  @@index([entity])
+  @@index([createdAt])
+  @@index([action])
 }
 

@@ -2,8 +2,9 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { ShoppingCart, Heart, Star, Eye } from 'lucide-react'
+import { ShoppingCart, Heart, Star, Eye, Scale } from 'lucide-react'
 import { useCartStore } from '@/store/cart-store'
+import { useComparisonStore } from '@/store/comparison-store'
 import { useSession } from 'next-auth/react'
 import { useToast } from '@/components/ToastProvider'
 import { useState, useEffect } from 'react'
@@ -36,10 +37,12 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem)
+  const { addProduct, removeProduct, isInComparison, canAddMore } = useComparisonStore()
   const [isHovered, setIsHovered] = useState(false)
   const [isInWishlist, setIsInWishlist] = useState(false)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [showQuickView, setShowQuickView] = useState(false)
+  const [inComparison, setInComparison] = useState(false)
   const { data: session } = useSession()
   const { showSuccess, showError } = useToast()
 
@@ -51,6 +54,29 @@ export default function ProductCard({ product }: ProductCardProps) {
         .catch(console.error)
     }
   }, [session, product.id])
+
+  useEffect(() => {
+    setInComparison(isInComparison(product.id))
+  }, [product.id, isInComparison])
+
+  const toggleComparison = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (inComparison) {
+      removeProduct(product.id)
+      setInComparison(false)
+      showSuccess('Removed from comparison')
+    } else {
+      if (canAddMore()) {
+        addProduct(product.id)
+        setInComparison(true)
+        showSuccess('Added to comparison')
+      } else {
+        showError('Maximum 4 products can be compared')
+      }
+    }
+  }
 
   const toggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -220,6 +246,22 @@ export default function ProductCard({ product }: ProductCardProps) {
             )}
 
           </div>
+
+          {/* Comparison Button - Top Left Below Badges */}
+          <button 
+            className={`absolute top-3 left-3 mt-20 p-2.5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-110 ${
+              inComparison 
+                ? 'bg-primary-600 text-white' 
+                : 'bg-white/95 backdrop-blur-sm text-gray-600'
+            }`}
+            onClick={toggleComparison}
+            aria-label={inComparison ? "Remove from comparison" : "Add to comparison"}
+          >
+            <Scale 
+              size={20} 
+              className={`transition-all duration-200`} 
+            />
+          </button>
 
           {/* Wishlist Button - Always Visible */}
           <button 
