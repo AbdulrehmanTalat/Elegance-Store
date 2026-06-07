@@ -133,6 +133,10 @@ export default function CheckoutPage() {
 
       const result = await response.json()
 
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to place order')
+      }
+
       if (data.paymentMethod === 'ONLINE') {
         if (result.paymentUrl) {
           // Clear cart before redirect (online payment handles cart clearing on success callback)
@@ -141,13 +145,13 @@ export default function CheckoutPage() {
         }
       } else {
         // For COD, navigate first then clear cart to avoid empty cart flash
-        window.location.href = `/orders/${result.orderId}?new=true`
+        window.location.href = `/orders/${result.orderId}?new=true${session ? '' : `&email=${encodeURIComponent(data.email || '')}`}`
         // Cart will be cleared on the order page or after navigation
         setTimeout(() => clearCart(), 100)
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Checkout error:', error)
-      showError('An error occurred. Please try again.')
+      showError(error.message || 'An error occurred. Please try again.')
     } finally {
       setLoading(false)
     }

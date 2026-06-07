@@ -238,7 +238,7 @@ export async function POST(req: NextRequest) {
           quantity: item.quantity,
         })),
         mode: 'payment',
-        success_url: `${process.env.NEXTAUTH_URL}/orders/${order.id}?success=true`,
+        success_url: `${process.env.NEXTAUTH_URL}/orders/${order.id}?success=true${session?.user ? '' : `&email=${encodeURIComponent(userEmail)}`}`,
         cancel_url: `${process.env.NEXTAUTH_URL}/checkout?canceled=true`,
         metadata: {
           orderId: order.id,

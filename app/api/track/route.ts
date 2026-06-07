@@ -20,8 +20,16 @@ export async function POST(req: NextRequest) {
       include: {
         items: {
           include: {
-            product: true,
-            variant: true,
+            product: {
+              include: {
+                colors: true,
+              },
+            },
+            variant: {
+              include: {
+                color: true,
+              },
+            },
           },
         },
       },

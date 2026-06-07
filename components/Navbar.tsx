@@ -68,6 +68,7 @@ export default function Navbar() {
             <Link
               href="/cart"
               className="relative hover:text-primary-600 transition"
+              aria-label="View Shopping Cart"
             >
               <ShoppingCart size={24} />
               {itemCount > 0 && (
@@ -105,6 +106,8 @@ export default function Navbar() {
           <button
             className="md:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle Navigation Menu"
+            aria-expanded={mobileMenuOpen}
           >
             <Menu size={24} />
           </button>

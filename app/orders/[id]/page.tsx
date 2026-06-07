@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { Package } from 'lucide-react'
 import OrderDetails from '@/components/OrderDetails'
 
-async function getOrder(id: string, userId: string) {
+async function getOrder(id: string, userId?: string, email?: string) {
   try {
     const order = await prisma.order.findUnique({
       where: { id },
@@ -32,11 +32,17 @@ async function getOrder(id: string, userId: string) {
       },
     })
 
-    if (!order || order.userId !== userId) {
-      return null
+    if (!order) return null
+
+    if (userId && order.userId === userId) {
+      return order
     }
 
-    return order
+    if (email && order.email === email) {
+      return order
+    }
+
+    return null
   } catch (error) {
     console.error('Error fetching order:', error)
     return null
@@ -48,14 +54,15 @@ export default async function OrderPage({
   searchParams,
 }: {
   params: { id: string }
-  searchParams: { success?: string; new?: string }
+  searchParams: { success?: string; new?: string; email?: string }
 }) {
   const session = await getServerSession(authOptions)
-  if (!session?.user) {
+  
+  if (!session?.user && !searchParams.email) {
     redirect('/auth/signin')
   }
 
-  const order = await getOrder(params.id, session.user.id)
+  const order = await getOrder(params.id, session?.user?.id, searchParams.email)
 
   if (!order) {
     return (
