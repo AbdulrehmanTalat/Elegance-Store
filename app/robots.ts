@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
             allow: '/',
             disallow: ['/admin/', '/api/', '/profile/', '/checkout/', '/cart/'],
         },
-        sitemap: 'https://elegance-store.vercel.app/sitemap.xml',
+        sitemap: 'https://www.elegancestore.online/sitemap.xml',
     }
 }

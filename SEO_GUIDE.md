@@ -18,7 +18,7 @@ This guide provides detailed instructions for setting up and maintaining SEO for
 ### 1. Create Property
 1. Go to [Google Search Console](https://search.google.com/search-console)
 2. Click "Add Property"
-3. Enter your domain: `elegance-store.vercel.app`
+3. Enter your domain: `www.elegancestore.online`
 4. Verify ownership using one of these methods:
    - **HTML file upload** (recommended for Vercel)
    - DNS record
@@ -26,7 +26,7 @@ This guide provides detailed instructions for setting up and maintaining SEO for
 
 ### 2. Submit Sitemap
 1. In Search Console, go to "Sitemaps" in the left menu
-2. Add new sitemap: `https://elegance-store.vercel.app/sitemap.xml`
+2. Add new sitemap: `https://www.elegancestore.online/sitemap.xml`
 3. Click "Submit"
 
 ### 3. Monitor Performance

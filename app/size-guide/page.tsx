@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: 'Size Guide | Elegance Store',
   description: 'Find your perfect fit with our comprehensive size guides for lingerie, jewelry, and more. Expert measurement tips and size charts.',
   alternates: {
-    canonical: 'https://elegance-store.vercel.app/size-guide',
+    canonical: 'https://www.elegancestore.online/size-guide',
   },
 }
 

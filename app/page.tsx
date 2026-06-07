@@ -126,8 +126,8 @@ export default async function Home() {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'Elegance Store',
-    url: 'https://elegance-store.vercel.app',
-    logo: 'https://elegance-store.vercel.app/logo.png',
+    url: 'https://www.elegancestore.online',
+    logo: 'https://www.elegancestore.online/logo.png',
     description: 'Premium lingerie, jewelry, and makeup store in Pakistan',
     sameAs: [
       'https://facebook.com/elegancestore',
@@ -140,12 +140,12 @@ export default async function Home() {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'Elegance Store',
-    url: 'https://elegance-store.vercel.app',
+    url: 'https://www.elegancestore.online',
     potentialAction: {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: 'https://elegance-store.vercel.app/products?search={search_term_string}',
+        urlTemplate: 'https://www.elegancestore.online/products?search={search_term_string}',
       },
       'query-input': 'required name=search_term_string',
     },

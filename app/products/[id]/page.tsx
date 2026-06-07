@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   }
 
   const displayImage = product.colors?.[0]?.images?.[0] || product.image || '/og-image.jpg'
-  const productUrl = `https://elegance-store.vercel.app/products/${params.id}`
+  const productUrl = `https://www.elegancestore.online/products/${params.id}`
   
   // Get all product images for OG tags
   const allImages = product.colors?.flatMap(color => color.images) || [product.image].filter(Boolean)
@@ -153,7 +153,7 @@ export default async function ProductPage({
     },
     offers: {
       '@type': 'Offer',
-      url: `https://elegance-store.vercel.app/products/${product.id}`,
+      url: `https://www.elegancestore.online/products/${product.id}`,
       priceCurrency: 'PKR',
       price: product.basePrice || 0,
       priceValidUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -215,19 +215,19 @@ export default async function ProductPage({
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: 'https://elegance-store.vercel.app',
+        item: 'https://www.elegancestore.online',
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: product.category.charAt(0) + product.category.slice(1).toLowerCase(),
-        item: `https://elegance-store.vercel.app/products?category=${product.category}`,
+        item: `https://www.elegancestore.online/products?category=${product.category}`,
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: product.name,
-        item: `https://elegance-store.vercel.app/products/${product.id}`,
+        item: `https://www.elegancestore.online/products/${product.id}`,
       },
     ],
   }

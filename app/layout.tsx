@@ -11,7 +11,7 @@ import ComparisonBar from '@/components/ComparisonBar'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://elegance-store.vercel.app'),
+  metadataBase: new URL('https://www.elegancestore.online'),
   title: {
     default: 'Elegance Store - Ladies Fashion & Beauty',
     template: '%s | Elegance Store',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://elegance-store.vercel.app',
+    url: 'https://www.elegancestore.online',
     title: 'Elegance Store - Ladies Fashion & Beauty',
     description: 'Discover premium lingerie, jewelry, and makeup at Elegance Store.',
     siteName: 'Elegance Store',
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: 'https://elegance-store.vercel.app',
+    canonical: 'https://www.elegancestore.online',
   },
 }
 
@@ -79,8 +79,8 @@ export default function RootLayout({
                 '@context': 'https://schema.org',
                 '@type': 'Organization',
                 name: 'Elegance Store',
-                url: 'https://elegance-store.vercel.app',
-                logo: 'https://elegance-store.vercel.app/logo.png',
+                url: 'https://www.elegancestore.online',
+                logo: 'https://www.elegancestore.online/logo.png',
                 description: 'Premium lingerie, jewelry, and makeup for women in Pakistan',
                 address: {
                   '@type': 'PostalAddress',
@@ -101,12 +101,12 @@ export default function RootLayout({
                 '@context': 'https://schema.org',
                 '@type': 'WebSite',
                 name: 'Elegance Store',
-                url: 'https://elegance-store.vercel.app',
+                url: 'https://www.elegancestore.online',
                 potentialAction: {
                   '@type': 'SearchAction',
                   target: {
                     '@type': 'EntryPoint',
-                    urlTemplate: 'https://elegance-store.vercel.app/products?search={search_term_string}',
+                    urlTemplate: 'https://www.elegancestore.online/products?search={search_term_string}',
                   },
                   'query-input': 'required name=search_term_string',
                 },

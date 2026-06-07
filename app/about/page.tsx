@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: 'Discover Elegance Store - Pakistan\'s trusted destination for premium lingerie, jewelry, and makeup. Quality products, exceptional service, and customer satisfaction guaranteed.',
   keywords: ['about elegance store', 'lingerie store pakistan', 'jewelry store pakistan', 'makeup store pakistan', 'online shopping pakistan'],
   alternates: {
-    canonical: 'https://elegance-store.vercel.app/about',
+    canonical: 'https://www.elegancestore.online/about',
   },
 }
 

@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: 'Privacy Policy | Elegance Store',
   description: 'Learn how Elegance Store collects, uses, and protects your personal information. Your privacy and data security are our top priorities.',
   alternates: {
-    canonical: 'https://elegance-store.vercel.app/privacy',
+    canonical: 'https://www.elegancestore.online/privacy',
   },
 }
 

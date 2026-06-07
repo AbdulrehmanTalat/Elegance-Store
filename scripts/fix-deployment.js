@@ -13,8 +13,8 @@ console.log('🚀 Fixing Elegance Store deployment issues...\n');
 
 // Set the correct environment variables for Vercel
 const envVars = {
-  'EMAIL_IMAGE_BASE_URL': 'https://elegance-store-seven.vercel.app',
-  'NEXTAUTH_URL': 'https://elegance-store-seven.vercel.app'
+  'EMAIL_IMAGE_BASE_URL': 'https://www.elegancestore.online',
+  'NEXTAUTH_URL': 'https://www.elegancestore.online'
 };
 
 console.log('📧 Setting email image base URL for production...');
@@ -65,7 +65,7 @@ try {
   console.error('\n❌ Error during deployment fix:', error.message);
   console.log('\n📝 Manual steps required:');
   console.log('   1. Go to Vercel dashboard > Your Project > Settings > Environment Variables');
-  console.log('   2. Set EMAIL_IMAGE_BASE_URL = https://elegance-store-seven.vercel.app');
-  console.log('   3. Set NEXTAUTH_URL = https://elegance-store-seven.vercel.app');
+  console.log('   2. Set EMAIL_IMAGE_BASE_URL = https://www.elegancestore.online');
+  console.log('   3. Set NEXTAUTH_URL = https://www.elegancestore.online');
   console.log('   4. Redeploy your application');
 }

@@ -3,7 +3,7 @@
  * Helper functions for generating canonical URLs, meta tags, and schema helpers
  */
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://elegance-store.vercel.app'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elegancestore.online'
 
 /**
  * Generate a canonical URL for a given path

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: 'Discover fashion tips, lingerie care guides, jewelry trends, and makeup tutorials. Expert advice for elegant women in Pakistan.',
   keywords: ['fashion blog', 'beauty tips', 'lingerie care', 'jewelry trends', 'makeup tutorials', 'style guide'],
   alternates: {
-    canonical: 'https://elegance-store.vercel.app/blog',
+    canonical: 'https://www.elegancestore.online/blog',
   },
 }
 
@@ -126,13 +126,13 @@ export default async function BlogPage({
             '@type': 'Blog',
             name: 'Elegance Store Blog',
             description: 'Fashion tips, lingerie care guides, and beauty tutorials',
-            url: 'https://elegance-store.vercel.app/blog',
+            url: 'https://www.elegancestore.online/blog',
             publisher: {
               '@type': 'Organization',
               name: 'Elegance Store',
               logo: {
                 '@type': 'ImageObject',
-                url: 'https://elegance-store.vercel.app/logo.png',
+                url: 'https://www.elegancestore.online/logo.png',
               },
             },
           }),

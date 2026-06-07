@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: 'Find answers to common questions about ordering, shipping, returns, sizing, and product care at Elegance Store.',
   keywords: ['FAQ', 'help', 'customer service', 'shipping info', 'returns', 'sizing guide'],
   alternates: {
-    canonical: 'https://elegance-store.vercel.app/faq',
+    canonical: 'https://www.elegancestore.online/faq',
   },
 }
 

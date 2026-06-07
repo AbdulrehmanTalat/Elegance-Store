@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: 'Returns & Exchanges - Elegance Store',
   description: 'Return and exchange policy for Elegance Store - Easy returns within 7 days',
   alternates: {
-    canonical: 'https://elegance-store.vercel.app/returns',
+    canonical: 'https://www.elegancestore.online/returns',
   },
 }
 

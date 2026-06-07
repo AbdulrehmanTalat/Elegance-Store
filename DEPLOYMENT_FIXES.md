@@ -27,8 +27,8 @@ If you're still experiencing issues, please follow these steps:
 3. Go to **Settings** → **Environment Variables**
 4. Add/Update these variables for **Production**:
    ```
-   EMAIL_IMAGE_BASE_URL = https://elegance-store-seven.vercel.app
-   NEXTAUTH_URL = https://elegance-store-seven.vercel.app
+   EMAIL_IMAGE_BASE_URL = https://www.elegancestore.online
+   NEXTAUTH_URL = https://www.elegancestore.online
    ```
 
 ### Step 2: Redeploy
@@ -38,7 +38,7 @@ If you're still experiencing issues, please follow these steps:
 
 ### Step 3: Test the Fixes
 1. **Sign-In Test**: 
-   - Go to https://elegance-store-seven.vercel.app/auth/signin
+   - Go to https://www.elegancestore.online/auth/signin
    - Sign in as user → Should redirect to profile page
    - Sign in as admin → Should redirect to admin page
 

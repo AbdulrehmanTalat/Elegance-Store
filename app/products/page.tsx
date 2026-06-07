@@ -30,7 +30,7 @@ export async function generateMetadata({ searchParams }: ProductsPageProps): Pro
   const search = searchParams.search
   
   // Base canonical URL logic
-  let canonicalUrl = 'https://elegance-store.vercel.app/products'
+  let canonicalUrl = 'https://www.elegancestore.online/products'
   if (category) {
     canonicalUrl += `?category=${category}`
   }
@@ -66,7 +66,7 @@ export async function generateMetadata({ searchParams }: ProductsPageProps): Pro
     description: 'Browse our complete collection of lingerie, jewelry, and makeup. Premium quality products at affordable prices with free shipping.',
     keywords: 'online shopping, lingerie, jewelry, makeup, beauty products, fashion',
     alternates: {
-      canonical: 'https://elegance-store.vercel.app/products',
+      canonical: 'https://www.elegancestore.online/products',
     },
   }
 }

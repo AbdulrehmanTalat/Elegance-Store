@@ -75,7 +75,7 @@ DATABASE_URL=your_neon_postgresql_connection_string
 ### 2. NextAuth Configuration
 ```
 NEXTAUTH_SECRET=your_secret_key_here
-NEXTAUTH_URL=https://elegance-store-self.vercel.app
+NEXTAUTH_URL=https://www.elegancestore.online
 ```
 - Generate `NEXTAUTH_SECRET` using: `openssl rand -base64 32`
 - Set `NEXTAUTH_URL` to your Vercel deployment URL

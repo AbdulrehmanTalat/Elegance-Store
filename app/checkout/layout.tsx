@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description: 'Complete your purchase securely at Elegance Store.',
   robots: { index: false, follow: false }, // Never index checkout
   alternates: {
-    canonical: 'https://elegance-store.vercel.app/checkout',
+    canonical: 'https://www.elegancestore.online/checkout',
   },
 }
 

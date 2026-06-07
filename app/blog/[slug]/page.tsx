@@ -81,7 +81,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       images: post.featuredImage ? [post.featuredImage] : [],
     },
     alternates: {
-      canonical: `https://elegance-store.vercel.app/blog/${params.slug}`,
+      canonical: `https://www.elegancestore.online/blog/${params.slug}`,
     },
   }
 }
@@ -114,12 +114,12 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       name: 'Elegance Store',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://elegance-store.vercel.app/logo.png',
+        url: 'https://www.elegancestore.online/logo.png',
       },
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `https://elegance-store.vercel.app/blog/${post.slug}`,
+      '@id': `https://www.elegancestore.online/blog/${post.slug}`,
     },
   }
 
@@ -210,7 +210,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             <div className="flex items-center gap-4 pt-8 border-t">
               <span className="font-semibold text-gray-700">Share:</span>
               <a
-                href={`https://www.facebook.com/sharer/sharer.php?u=https://elegance-store.vercel.app/blog/${post.slug}`}
+                href={`https://www.facebook.com/sharer/sharer.php?u=https://www.elegancestore.online/blog/${post.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:text-blue-700 transition"
@@ -218,7 +218,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                 Facebook
               </a>
               <a
-                href={`https://twitter.com/intent/tweet?url=https://elegance-store.vercel.app/blog/${post.slug}&text=${encodeURIComponent(post.title)}`}
+                href={`https://twitter.com/intent/tweet?url=https://www.elegancestore.online/blog/${post.slug}&text=${encodeURIComponent(post.title)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-400 hover:text-blue-500 transition"
@@ -226,7 +226,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
                 Twitter
               </a>
               <a
-                href={`https://www.linkedin.com/sharing/share-offsite/?url=https://elegance-store.vercel.app/blog/${post.slug}`}
+                href={`https://www.linkedin.com/sharing/share-offsite/?url=https://www.elegancestore.online/blog/${post.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-700 hover:text-blue-800 transition"
