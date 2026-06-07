@@ -85,7 +85,7 @@ export default function AdminPage() {
     if (status === 'loading') return
 
     // If we have an admin session, fetch products
-    if (session && session.user.role === 'ADMIN') {
+    if (session && (session.user.role === 'ADMIN' || session.user.role === 'SUPER_ADMIN')) {
       fetchProducts()
     }
   }, [session, status])
@@ -262,7 +262,7 @@ export default function AdminPage() {
   }
 
   // If not admin, show access denied
-  if (session.user?.role !== 'ADMIN') {
+  if (session.user?.role !== 'ADMIN' && session.user?.role !== 'SUPER_ADMIN') {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">

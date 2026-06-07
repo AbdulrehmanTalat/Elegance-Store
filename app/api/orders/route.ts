@@ -14,12 +14,36 @@ export const dynamic = 'force-dynamic'
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     const body = await req.json()
-    const { items, shippingAddress, phone, paymentMethod, couponId, discountAmount } = body
+    const { items, shippingAddress, phone, paymentMethod, couponId, discountAmount, guestName, guestEmail } = body
+
+    let orderUser = null
+    let userEmail = ""
+
+    if (session?.user) {
+      orderUser = { id: session.user.id }
+      userEmail = session.user.email!
+    } else {
+      if (!guestEmail || !guestName) {
+        return NextResponse.json({ error: 'Email and name are required for guest checkout' }, { status: 400 })
+      }
+      userEmail = guestEmail
+      // Find or create guest user
+      let user = await prisma.user.findUnique({
+        where: { email: guestEmail }
+      })
+      if (!user) {
+        user = await prisma.user.create({
+          data: {
+            email: guestEmail,
+            name: guestName,
+            role: 'USER',
+            phone: phone,
+          }
+        })
+      }
+      orderUser = { id: user.id }
+    }
 
     if (!items || items.length === 0) {
       return NextResponse.json(
@@ -67,7 +91,7 @@ export async function POST(req: NextRequest) {
     // Create order
     const order = await prisma.order.create({
       data: {
-        userId: session.user.id,
+        userId: orderUser.id,
         totalAmount: finalTotalAmount,
         discountAmount: discountAmount || 0,
         couponId: couponId || null,
@@ -75,7 +99,7 @@ export async function POST(req: NextRequest) {
         paymentStatus: paymentMethod === 'COD' ? 'PENDING' : 'PENDING',
         shippingAddress,
         phone,
-        email: session.user.email!,
+        email: userEmail,
         items: {
           create: await Promise.all(
             items.map(async (item: any) => {
@@ -123,7 +147,7 @@ export async function POST(req: NextRequest) {
       await prisma.couponUsage.create({
         data: {
           couponId,
-          userId: session.user.id,
+          userId: orderUser.id,
           orderId: order.id,
           discount: discountAmount,
         },
@@ -167,7 +191,7 @@ export async function POST(req: NextRequest) {
 
     // Send confirmation email to customer
     await sendOrderConfirmationEmail(
-      session.user.email!,
+      userEmail,
       order.id,
       finalTotalAmount,
       shippingAddress,
@@ -190,7 +214,7 @@ export async function POST(req: NextRequest) {
           admin.email,
           order.id,
           totalAmount,
-          session.user.email!,
+          userEmail,
           shippingAddress,
           phone,
           emailItems,

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/store/cart-store'
@@ -19,20 +19,21 @@ import {
   Truck, 
   ShieldCheck,
   Banknote,
-  Lock
+  Lock,
+  User
 } from 'lucide-react'
 
-const checkoutSchema = z.object({
-  streetAddress1: z.string().min(5, 'Street Address 1 must be at least 5 characters'),
-  streetAddress2: z.string().optional(),
-  city: z.string().min(1, 'Please select a city'),
-  state: z.string().min(1, 'Please select a state/province'),
-  zipCode: z.string().min(4, 'Zip code must be at least 4 characters'),
-  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
-  paymentMethod: z.enum(['ONLINE', 'COD']),
-})
-
-type CheckoutFormData = z.infer<typeof checkoutSchema>
+type CheckoutFormData = {
+  name?: string
+  email?: string
+  streetAddress1: string
+  streetAddress2?: string
+  city: string
+  state: string
+  zipCode: string
+  phone: string
+  paymentMethod: 'ONLINE' | 'COD'
+}
 
 export default function CheckoutPage() {
   const { data: session, status } = useSession()
@@ -45,6 +46,20 @@ export default function CheckoutPage() {
   const [currentStep, setCurrentStep] = useState(1)
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null)
   const [discount, setDiscount] = useState<any>(null)
+
+  const checkoutSchema = useMemo(() => {
+    return z.object({
+      name: !session ? z.string().min(3, 'Full Name is required') : z.string().optional(),
+      email: !session ? z.string().email('Please enter a valid email address') : z.string().optional(),
+      streetAddress1: z.string().min(5, 'Street Address 1 must be at least 5 characters'),
+      streetAddress2: z.string().optional(),
+      city: z.string().min(1, 'Please select a city'),
+      state: z.string().min(1, 'Please select a state/province'),
+      zipCode: z.string().min(4, 'Zip code must be at least 4 characters'),
+      phone: z.string().min(10, 'Phone number must be at least 10 digits'),
+      paymentMethod: z.enum(['ONLINE', 'COD']),
+    })
+  }, [session])
 
   const {
     register,
@@ -81,32 +96,7 @@ export default function CheckoutPage() {
     )
   }
 
-  if (status === 'unauthenticated' || !session) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
-          <div className="bg-primary-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
-            <Lock className="text-primary-600" size={40} />
-          </div>
-          <h2 className="text-3xl font-bold mb-4">Sign In Required</h2>
-          <p className="text-gray-600 mb-8">Please sign in to proceed with your purchase.</p>
-          <button
-            onClick={() => router.push('/auth/signin?callbackUrl=/checkout')}
-            className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-4 rounded-xl hover:from-primary-700 hover:to-primary-800 transition-all duration-200 shadow-lg hover:shadow-xl font-semibold"
-          >
-            Sign In to Continue
-          </button>
-        </div>
-      </div>
-    )
-  }
-
   const onSubmit = async (data: CheckoutFormData) => {
-    if (!session) {
-      router.push('/auth/signin?callbackUrl=/checkout')
-      return
-    }
-
     setLoading(true)
 
     const shippingAddress = [
@@ -136,6 +126,8 @@ export default function CheckoutPage() {
           paymentMethod: data.paymentMethod,
           couponId: appliedCoupon?.id,
           discountAmount: discount?.amount || 0,
+          guestName: data.name,
+          guestEmail: data.email,
         }),
       })
 
@@ -245,6 +237,53 @@ export default function CheckoutPage() {
           {/* Form Section */}
           <div className="lg:col-span-3">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              {!session && (
+                <div className="bg-white rounded-2xl shadow-lg p-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="bg-primary-100 p-3 rounded-xl">
+                      <User className="text-primary-600" size={24} />
+                    </div>
+                    <h2 className="text-2xl font-bold">Contact Information</h2>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Full Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        {...register('name')}
+                        className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all"
+                        placeholder="John Doe"
+                      />
+                      {errors.name && (
+                        <p className="text-red-600 text-sm mt-2 flex items-center gap-1">
+                          ⚠️ {errors.name.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Email Address <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        {...register('email')}
+                        className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition-all"
+                        placeholder="john@example.com"
+                      />
+                      {errors.email && (
+                        <p className="text-red-600 text-sm mt-2 flex items-center gap-1">
+                          ⚠️ {errors.email.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Shipping Information Card */}
               <div className="bg-white rounded-2xl shadow-lg p-8">
                 <div className="flex items-center gap-3 mb-6">

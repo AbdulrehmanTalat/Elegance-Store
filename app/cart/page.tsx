@@ -244,25 +244,20 @@ export default function CartPage() {
                 </div>
               </div>
 
-              {session ? (
-                <Link
-                  href="/checkout"
-                  className="block w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white text-center px-6 py-4 rounded-xl hover:from-primary-700 hover:to-primary-800 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 mb-3"
-                >
-                  Proceed to Checkout
-                </Link>
-              ) : (
-                <div className="space-y-3 mb-3">
-                  <p className="text-sm text-gray-600 text-center">
-                    Please sign in to complete your purchase
-                  </p>
-                  <Link
-                    href="/auth/signin?callbackUrl=/checkout"
-                    className="block w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white text-center px-6 py-4 rounded-xl hover:from-primary-700 hover:to-primary-800 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl"
-                  >
-                    Sign In to Checkout
+              <Link
+                href="/checkout"
+                className="block w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white text-center px-6 py-4 rounded-xl hover:from-primary-700 hover:to-primary-800 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 mb-3"
+              >
+                Proceed to Checkout
+              </Link>
+
+              {!session && (
+                <p className="text-sm text-gray-500 text-center mb-3">
+                  Already have an account?{' '}
+                  <Link href="/auth/signin?callbackUrl=/checkout" className="text-primary-600 hover:underline font-semibold">
+                    Sign In
                   </Link>
-                </div>
+                </p>
               )}
 
               <div className="space-y-2 text-center text-sm text-gray-500">
