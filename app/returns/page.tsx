@@ -4,6 +4,9 @@ import { Package, RotateCcw, CheckCircle, XCircle, AlertCircle, Mail } from 'luc
 export const metadata: Metadata = {
   title: 'Returns & Exchanges - Elegance Store',
   description: 'Return and exchange policy for Elegance Store - Easy returns within 7 days',
+  alternates: {
+    canonical: 'https://elegance-store.vercel.app/returns',
+  },
 }
 
 export default function ReturnsPage() {

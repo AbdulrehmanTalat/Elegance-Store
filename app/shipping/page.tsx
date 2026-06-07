@@ -4,6 +4,9 @@ import { Truck, Package, MapPin, Clock, DollarSign, Shield } from 'lucide-react'
 export const metadata: Metadata = {
   title: 'Shipping Info - Elegance Store',
   description: 'Shipping information and delivery details for Elegance Store - Fast delivery across Pakistan',
+  alternates: {
+    canonical: 'https://elegance-store.vercel.app/shipping',
+  },
 }
 
 export default function ShippingPage() {
