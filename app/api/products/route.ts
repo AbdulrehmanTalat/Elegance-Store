@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 
     // Check if admin is requesting all products
     const session = await getServerSession(authOptions)
-    const isAdmin = session?.user?.role === 'ADMIN'
+    const isAdmin = session?.user?.role === 'ADMIN' || session?.user?.role === 'SUPER_ADMIN'
 
     const where: any = {}
 
@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    if (!session?.user || session.user.role !== 'ADMIN') {
+    if (!session?.user || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

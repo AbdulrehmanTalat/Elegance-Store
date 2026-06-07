@@ -71,6 +71,8 @@ export default function AdminOrdersPage() {
   const [statusFilter, setStatusFilter] = useState<string>('ALL')
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null)
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null)
+  const [pendingStatus, setPendingStatus] = useState<{ [orderId: string]: string }>({})
+  const [trackingInfo, setTrackingInfo] = useState<{ [orderId: string]: { trackingId: string, courier: string } }>({})
 
   useEffect(() => {
     if (status === 'loading') return
@@ -117,13 +119,13 @@ export default function AdminOrdersPage() {
     setFilteredOrders(filtered)
   }, [searchQuery, statusFilter, orders])
 
-  const updateOrderStatus = async (orderId: string, newStatus: string) => {
+  const updateOrderStatus = async (orderId: string, newStatus: string, trackingId?: string, courier?: string) => {
     setUpdatingOrderId(orderId)
     try {
       const response = await fetch(`/api/admin/orders/${orderId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({ status: newStatus, trackingId, courier }),
       })
 
       if (response.ok) {

@@ -318,7 +318,9 @@ export async function sendOrderStatusUpdateEmail(
   shippingAddress: string,
   phone: string,
   items: OrderItem[],
-  orderDate?: Date | string
+  orderDate?: Date | string,
+  trackingId?: string | null,
+  courier?: string | null
 ) {
   try {
     const statusColors: Record<string, string> = {
@@ -371,6 +373,15 @@ export async function sendOrderStatusUpdateEmail(
                         <p style="margin: 0; color: #666666; font-size: 14px;"><strong style="color: #333333;">Order Number:</strong> <span style="color: ${STORE_COLOR}; font-size: 18px; font-weight: bold;">${orderId}</span></p>
                         ${orderDate ? `<p style="margin: 10px 0 0 0; color: #666666; font-size: 14px;"><strong style="color: #333333;">Order Date & Time:</strong> ${new Date(orderDate).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true })}</p>` : ''}
                       </div>
+
+                      ${trackingId && courier ? `
+                      <!-- Tracking Information -->
+                      <div style="background-color: #f0fdf4; border-left: 4px solid #10b981; padding: 20px; margin: 30px 0; border-radius: 4px;">
+                        <h3 style="color: #10b981; margin: 0 0 10px 0; font-size: 16px;">Tracking Information</h3>
+                        <p style="margin: 0 0 8px 0; color: #666666; font-size: 14px;"><strong style="color: #333333;">Courier Company:</strong> ${courier}</p>
+                        <p style="margin: 0; color: #666666; font-size: 14px;"><strong style="color: #333333;">Tracking Number:</strong> <span style="font-weight: bold; font-family: monospace;">${trackingId}</span></p>
+                      </div>
+                      ` : ''}
                       
                       <!-- Order Items -->
                       <h3 style="color: #333333; font-size: 20px; margin: 30px 0 20px 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">Order Items</h3>

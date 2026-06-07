@@ -17,6 +17,8 @@ const updateOrderSchema = z.object({
     'DELIVERED',
     'CANCELLED',
   ]),
+  trackingId: z.string().optional().nullable(),
+  courier: z.string().optional().nullable(),
 })
 
 export async function PUT(
@@ -34,8 +36,10 @@ export async function PUT(
     const validatedData = updateOrderSchema.parse(body)
 
     // If order is cancelled, also update payment status to FAILED
-    const updateData: { status: OrderStatus; paymentStatus?: PaymentStatus } = {
+    const updateData: { status: OrderStatus; paymentStatus?: PaymentStatus; trackingId?: string | null; courier?: string | null } = {
       status: validatedData.status as OrderStatus,
+      trackingId: validatedData.trackingId,
+      courier: validatedData.courier,
     }
 
     if (validatedData.status === 'CANCELLED') {
@@ -160,7 +164,9 @@ export async function PUT(
       order.shippingAddress,
       order.phone,
       emailItems,
-      order.createdAt
+      order.createdAt,
+      validatedData.trackingId,
+      validatedData.courier
     )
 
     return NextResponse.json(order)
