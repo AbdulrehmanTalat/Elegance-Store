@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function Footer() {
   return (
@@ -6,7 +7,17 @@ export default function Footer() {
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">Elegance Store</h3>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="relative w-8 h-8">
+                <Image 
+                  src="/logo.png" 
+                  alt="Elegance Store Logo" 
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <h3 className="text-xl font-bold">Elegance Store</h3>
+            </div>
             <p className="text-gray-400">
               Your one-stop shop for ladies fashion and beauty products.
             </p>

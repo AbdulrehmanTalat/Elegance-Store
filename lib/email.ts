@@ -106,6 +106,7 @@ export async function sendOrderConfirmationEmail(
                   <!-- Header with Store Name -->
                   <tr>
                     <td style="background: linear-gradient(135deg, #ec4899 0%, #9333ea 100%); padding: 30px; text-align: center;">
+                      <img src="https://res.cloudinary.com/dxrk8firz/image/upload/v1780871414/ecommerce/elegance_store_logo.jpg" alt="${STORE_NAME} Logo" style="height: 50px; display: block; margin: 0 auto 10px auto;" />
                       <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: bold; letter-spacing: 2px;">${STORE_NAME}</h1>
                       <p style="color: #ffffff; margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">Elegant Fashion & Beauty</p>
                     </td>
@@ -225,6 +226,7 @@ export async function sendAdminOrderNotificationEmail(
                   <!-- Header -->
                   <tr>
                     <td style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 30px; text-align: center;">
+                      <img src="https://res.cloudinary.com/dxrk8firz/image/upload/v1780871414/ecommerce/elegance_store_logo.jpg" alt="${STORE_NAME} Logo" style="height: 50px; display: block; margin: 0 auto 10px auto;" />
                       <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: bold; letter-spacing: 2px;">🆕 New Order Received</h1>
                       <p style="color: #ffffff; margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">${STORE_NAME} - Action Required</p>
                     </td>
@@ -347,6 +349,7 @@ export async function sendOrderStatusUpdateEmail(
                   <!-- Header -->
                   <tr>
                     <td style="background: linear-gradient(135deg, #ec4899 0%, #9333ea 100%); padding: 30px; text-align: center;">
+                      <img src="https://res.cloudinary.com/dxrk8firz/image/upload/v1780871414/ecommerce/elegance_store_logo.jpg" alt="${STORE_NAME} Logo" style="height: 50px; display: block; margin: 0 auto 10px auto;" />
                       <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: bold; letter-spacing: 2px;">${STORE_NAME}</h1>
                     </td>
                   </tr>
@@ -455,6 +458,7 @@ export async function sendOTPEmail(email: string, otp: string) {
                   <!-- Header with Store Name -->
                   <tr>
                     <td style="background: linear-gradient(135deg, #ec4899 0%, #9333ea 100%); padding: 30px; text-align: center;">
+                      <img src="https://res.cloudinary.com/dxrk8firz/image/upload/v1780871414/ecommerce/elegance_store_logo.jpg" alt="${STORE_NAME} Logo" style="height: 50px; display: block; margin: 0 auto 10px auto;" />
                       <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: bold; letter-spacing: 2px;">${STORE_NAME}</h1>
                       <p style="color: #ffffff; margin: 10px 0 0 0; font-size: 14px; opacity: 0.9;">Elegant Fashion & Beauty</p>
                     </td>

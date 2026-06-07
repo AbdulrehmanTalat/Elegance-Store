@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useSession, signOut } from 'next-auth/react'
 import { ShoppingCart, User, Menu, Heart } from 'lucide-react'
 import { useCartStore } from '@/store/cart-store'
@@ -28,8 +29,17 @@ export default function Navbar() {
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
-          <Link href="/" className="text-2xl font-bold text-primary-600 flex-shrink-0">
-            Elegance Store
+          <Link href="/" className="flex items-center gap-2 text-2xl font-bold text-primary-600 flex-shrink-0">
+            <div className="relative w-8 h-8 md:w-10 md:h-10">
+              <Image 
+                src="/logo.png" 
+                alt="Elegance Store Logo" 
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+            <span className="hidden sm:inline-block">Elegance Store</span>
           </Link>
 
           <div className="hidden md:block flex-1 max-w-md mx-8">
