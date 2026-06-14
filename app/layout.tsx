@@ -54,9 +54,6 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  alternates: {
-    canonical: 'https://www.elegancestore.online',
-  },
 }
 
 export default function RootLayout({
