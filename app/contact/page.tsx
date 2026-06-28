@@ -58,8 +58,8 @@ export default function ContactPage() {
   }
 
   const contactEmail = 'contact-us@elegancestore.online'
-  const whatsappNumber = '+923001234567'
-  const phone = '+92 300 1234567'
+  const whatsappNumber = '+923398884625'
+  const phone = '03398884625'
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12">
@@ -233,7 +233,7 @@ export default function ContactPage() {
                   <div>
                     <h3 className="font-semibold mb-1">Location</h3>
                     <p className="text-white/90">
-                      Karachi, Pakistan
+                      Lahore, Pakistan
                     </p>
                   </div>
                 </div>

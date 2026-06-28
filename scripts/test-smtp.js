@@ -24,10 +24,11 @@ try {
   console.error("Error loading .env file:", e);
 }
 
-console.log("Testing Hostinger SMTP connection...");
-console.log("Host:", process.env.SMTP_HOST);
-console.log("Port:", process.env.SMTP_PORT);
-console.log("User:", process.env.SMTP_USER);
+console.log("-----------------------------------------");
+console.log("SMTP Host:", process.env.SMTP_HOST);
+console.log("SMTP Port:", process.env.SMTP_PORT);
+console.log("SMTP User:", process.env.SMTP_USER);
+console.log("-----------------------------------------");
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -39,12 +40,52 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-transporter.verify((error, success) => {
-  if (error) {
-    console.error("❌ SMTP connection failed:", error.message);
-    console.error(error);
-  } else {
-    console.log("✅ Success! Hostinger SMTP is configured correctly and ready to send emails.");
+async function runTests() {
+  const testRecipient = process.env.SMTP_USER; // Send to ourselves for testing
+  
+  // Test 1: Send from primary support email
+  try {
+    console.log(`\nTest 1: Sending test email from primary address (support@elegancestore.online)...`);
+    await transporter.sendMail({
+      from: `"Elegance Store Support" <support@elegancestore.online>`,
+      to: testRecipient,
+      subject: "Test 1: Support Email Connection Test",
+      text: "This is a test email sent using the primary support email address credentials.",
+    });
+    console.log("✅ Test 1 Succeeded!");
+  } catch (error) {
+    console.error("❌ Test 1 Failed:", error.message);
   }
+
+  // Test 2: Send from orders alias
+  try {
+    console.log(`\nTest 2: Sending test email from alias (orders@elegancestore.online)...`);
+    await transporter.sendMail({
+      from: '"Elegance Store Orders" <orders@elegancestore.online>',
+      to: testRecipient,
+      subject: "Test 2: Orders Email Alias Test",
+      text: "This is a test email sent using the orders alias address.",
+    });
+    console.log("✅ Test 2 Succeeded!");
+  } catch (error) {
+    console.error("❌ Test 2 Failed:", error.message);
+  }
+
+  // Test 3: Send from contact-us alias
+  try {
+    console.log(`\nTest 3: Sending test email from alias (contact-us@elegancestore.online)...`);
+    await transporter.sendMail({
+      from: '"Elegance Store Contact" <contact-us@elegancestore.online>',
+      to: testRecipient,
+      subject: "Test 3: Contact Email Alias Test",
+      text: "This is a test email sent using the contact-us alias address.",
+    });
+    console.log("✅ Test 3 Succeeded!");
+  } catch (error) {
+    console.error("❌ Test 3 Failed:", error.message);
+  }
+
   process.exit();
-});
+}
+
+runTests();
