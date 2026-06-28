@@ -31,7 +31,7 @@ export async function GET(
     }
 
     // Check if user owns the order or is admin
-    if (order.userId !== session.user.id && session.user.role !== 'ADMIN') {
+    if (order.userId !== session.user.id && session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
