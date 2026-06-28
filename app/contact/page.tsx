@@ -57,7 +57,7 @@ export default function ContactPage() {
     }
   }
 
-  const contactEmail = 'htesting22@gmail.com'
+  const contactEmail = 'contact-us@elegancestore.online'
   const whatsappNumber = '+923001234567'
   const phone = '+92 300 1234567'
 

@@ -37,7 +37,7 @@ export async function POST(request: Request) {
 
         // Send to admin
         await transporter.sendMail({
-            from: process.env.SMTP_FROM || process.env.SMTP_USER,
+            from: `"Elegance Store Contact" <contact-us@elegancestore.online>`,
             to: process.env.SMTP_USER, // Send to admin email
             replyTo: email,
             subject: `Contact Form: ${subject}`,
@@ -90,7 +90,7 @@ export async function POST(request: Request) {
 
         // Send confirmation to user
         await transporter.sendMail({
-            from: process.env.SMTP_FROM || process.env.SMTP_USER,
+            from: `"Elegance Store Contact" <contact-us@elegancestore.online>`,
             to: email,
             subject: 'We received your message - Elegance Store',
             html: `

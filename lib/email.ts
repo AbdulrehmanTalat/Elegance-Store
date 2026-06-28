@@ -88,7 +88,7 @@ export async function sendOrderConfirmationEmail(
       builtImageUrl: buildProductImageUrl(item.image)
     })))
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+      from: '"Elegance Store Orders" <orders@elegancestore.online>',
       to: email,
       subject: `Order Confirmation - ${STORE_NAME}`,
       html: `
@@ -208,7 +208,7 @@ export async function sendAdminOrderNotificationEmail(
 ) {
   try {
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+      from: '"Elegance Store Orders" <orders@elegancestore.online>',
       to: adminEmail,
       subject: `🆕 New Order Received - ${STORE_NAME} - Order #${orderId}`,
       html: `
@@ -333,7 +333,7 @@ export async function sendOrderStatusUpdateEmail(
     const statusColor = statusColors[status.toUpperCase()] || STORE_COLOR
 
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+      from: '"Elegance Store Orders" <orders@elegancestore.online>',
       to: email,
       subject: `Order Status Update - ${STORE_NAME}`,
       html: `
@@ -451,7 +451,7 @@ export async function sendOrderStatusUpdateEmail(
 export async function sendOTPEmail(email: string, otp: string) {
   try {
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || process.env.SMTP_USER,
+      from: '"Elegance Store Security" <admin@elegancestore.online>',
       to: email,
       subject: `Verify Your Email - ${STORE_NAME}`,
       html: `

@@ -140,7 +140,7 @@ export default function ReturnsPage() {
                   <div>
                     <h3 className="font-semibold text-lg mb-1">Contact Us (Within 24 Hours)</h3>
                     <p className="text-gray-700">
-                      Email us at <a href="mailto:htesting22@gmail.com" className="text-primary-600 hover:underline">htesting22@gmail.com</a> within 
+                      Email us at <a href="mailto:support@elegancestore.online" className="text-primary-600 hover:underline">support@elegancestore.online</a> within 
                       24 hours of delivery with your order number and reason for return. Include photos if the item is damaged or defective.
                     </p>
                   </div>
