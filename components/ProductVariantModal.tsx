@@ -395,6 +395,7 @@ export default function ProductVariantModal({
                                       className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
                                     >
                                       <option value="">Select Size</option>
+                                      <option value="Free Size">Free Size</option>
                                       <option value="XS">XS</option>
                                       <option value="S">S</option>
                                       <option value="M">M</option>
