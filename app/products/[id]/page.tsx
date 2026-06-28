@@ -249,7 +249,7 @@ export default async function ProductPage({
         name: 'What is your return policy?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'We offer a 30-day return policy on all products. Returns are free and hassle-free. Items must be unused and in their original packaging.',
+          text: 'To return or exchange an item, you must contact us within 24 hours of delivery. The process will then be completed within 7 days. Items must be unused and in original packaging.',
         },
       },
       {

@@ -59,15 +59,15 @@ const faqs = [
     questions: [
       {
         question: 'What is your return policy?',
-        answer: 'We offer a 30-day return policy on all items. Products must be unused, unwashed, and in original packaging with tags attached.',
+        answer: 'To return or exchange an item, you must contact us within 24 hours of delivery. Once initiated and approved, the entire return or exchange process will be completed within 7 days. Products must be unused, unwashed, and in original packaging with tags attached.',
       },
       {
         question: 'How do I return an item?',
-        answer: 'Contact our customer service to initiate a return. We\'ll provide you with a return shipping label. Once we receive and inspect the item, we\'ll process your refund within 5-7 business days.',
+        answer: 'Contact our customer service within 24 hours of delivery to initiate your return. We\'ll guide you through the process. Once we receive and inspect the item, your refund or exchange will be processed and completed within 7 days.',
       },
       {
         question: 'Can I exchange an item?',
-        answer: 'Yes! Exchanges are available for different sizes or colors within 30 days. Contact us to arrange an exchange.',
+        answer: 'Yes! Exchanges are available for different sizes or colors. You must contact us within 24 hours of delivery to arrange the exchange, which will then be completed within 7 days.',
       },
       {
         question: 'Are there any items that cannot be returned?',

@@ -169,8 +169,8 @@ export default function AboutPage() {
             <div className="flex items-start gap-3">
               <CheckCircle className="flex-shrink-0 mt-1" size={24} />
               <div>
-                <h3 className="font-bold text-lg mb-1">30-Day Returns</h3>
-                <p className="text-pink-100">Shop with confidence with our hassle-free return policy</p>
+                <h3 className="font-bold text-lg mb-1">Easy Returns</h3>
+                <p className="text-pink-100">Contact within 24 hours of delivery, completed within 7 days</p>
               </div>
             </div>
             <div className="flex items-start gap-3">

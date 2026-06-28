@@ -111,7 +111,7 @@ export default async function Home() {
     {
       iconName: 'rotate' as const,
       title: 'Easy Returns',
-      description: '30-day hassle-free returns. We make it simple.',
+      description: 'Contact within 24 hours. Processed in 7 days.',
       color: 'from-orange-400 to-red-500',
     },
     {

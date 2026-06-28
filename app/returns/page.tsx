@@ -3,7 +3,7 @@ import { Package, RotateCcw, CheckCircle, XCircle, AlertCircle, Mail } from 'luc
 
 export const metadata: Metadata = {
   title: 'Returns & Exchanges - Elegance Store',
-  description: 'Return and exchange policy for Elegance Store - Easy returns within 7 days',
+  description: 'Return and exchange policy - Contact within 24 hours of delivery, processed within 7 days.',
   alternates: {
     canonical: 'https://www.elegancestore.online/returns',
   },
@@ -17,7 +17,7 @@ export default function ReturnsPage() {
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Returns & Exchanges</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Your satisfaction is our priority. We offer hassle-free returns and exchanges within 7 days.
+            Your satisfaction is our priority. Please contact us within 24 hours of delivery to initiate a return or exchange, which will be processed within 7 days.
           </p>
         </div>
 
@@ -28,8 +28,8 @@ export default function ReturnsPage() {
               <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="text-green-600" size={32} />
               </div>
-              <h3 className="font-bold text-lg mb-2">7 Days Return</h3>
-              <p className="text-gray-600 text-sm">Easy returns within 7 days of delivery</p>
+              <h3 className="font-bold text-lg mb-2">24 Hours Notice</h3>
+              <p className="text-gray-600 text-sm">Contact us within 24 hours of delivery to initiate</p>
             </div>
 
             <div className="bg-white rounded-xl shadow-md p-6 text-center">
@@ -44,8 +44,8 @@ export default function ReturnsPage() {
               <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Package className="text-purple-600" size={32} />
               </div>
-              <h3 className="font-bold text-lg mb-2">Quick Refunds</h3>
-              <p className="text-gray-600 text-sm">Processed within 5-7 business days</p>
+              <h3 className="font-bold text-lg mb-2">Quick Process</h3>
+              <p className="text-gray-600 text-sm">Completed within 7 business days</p>
             </div>
           </div>
 
@@ -60,9 +60,10 @@ export default function ReturnsPage() {
                 <h2 className="text-2xl font-bold">Return Window</h2>
               </div>
               <p className="text-gray-700 leading-relaxed">
-                You have <span className="font-bold text-primary-600">7 days</span> from the date of delivery 
-                to initiate a return or exchange. Items must be returned in their original condition to qualify 
-                for a refund or exchange.
+                You must contact us within <span className="font-bold text-primary-600">24 hours</span> from the date of delivery 
+                to initiate a return or exchange. Once initiated and approved, the entire return or exchange process 
+                will be completed within <span className="font-bold text-primary-600">7 days</span>. Items must be returned 
+                in their original condition.
               </p>
             </section>
 
@@ -137,10 +138,10 @@ export default function ReturnsPage() {
                     1
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg mb-1">Contact Us</h3>
+                    <h3 className="font-semibold text-lg mb-1">Contact Us (Within 24 Hours)</h3>
                     <p className="text-gray-700">
-                      Email us at <a href="mailto:htesting22@gmail.com" className="text-primary-600 hover:underline">htesting22@gmail.com</a> with 
-                      your order number and reason for return. Include photos if the item is damaged or defective.
+                      Email us at <a href="mailto:htesting22@gmail.com" className="text-primary-600 hover:underline">htesting22@gmail.com</a> within 
+                      24 hours of delivery with your order number and reason for return. Include photos if the item is damaged or defective.
                     </p>
                   </div>
                 </div>
@@ -197,7 +198,7 @@ export default function ReturnsPage() {
                   (bank account for COD orders, original card for online payments).
                 </p>
                 <p className="text-gray-700">
-                  <strong>Processing Time:</strong> 5-7 business days after we receive your return.
+                  <strong>Processing Time:</strong> Processed and completed within 7 days of initiation.
                 </p>
                 <p className="text-gray-700">
                   <strong>Shipping Costs:</strong> Original shipping charges are non-refundable unless the 
