@@ -4,7 +4,7 @@ const prisma = new PrismaClient()
 
 async function promoteSuperAdmin() {
     try {
-        const email = 'htesting22@gmail.com'
+        const email = 'admin@elegancestore.online'
 
         // Update user role to SUPER_ADMIN
         const user = await prisma.user.update({

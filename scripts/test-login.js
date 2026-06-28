@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 
 async function testLogin() {
   try {
-    const email = 'htesting22@gmail.com'
+    const email = 'admin@elegancestore.online'
     const password = 'A7009674a!'
     
     console.log('Testing login with:')
@@ -26,7 +26,7 @@ async function testLogin() {
       const allUsers = await prisma.user.findMany({
         where: {
           email: {
-            contains: 'htesting22',
+            contains: 'admin',
             mode: 'insensitive',
           },
         },

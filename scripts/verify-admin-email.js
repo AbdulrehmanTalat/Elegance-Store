@@ -4,9 +4,9 @@ const prisma = new PrismaClient()
 
 async function verifyAdminEmail() {
   try {
-    const email = 'htesting22@gmail.com'
+    const email = 'admin@elegancestore.online'
     console.log('Verifying email for admin:', email)
-    
+
     const user = await prisma.user.findUnique({
       where: { email },
     })

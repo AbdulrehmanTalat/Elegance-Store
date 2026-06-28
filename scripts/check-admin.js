@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 
 async function checkAdmin() {
   try {
-    const email = 'htesting22@gmail.com'
+    const email = 'admin@elegancestore.online'
     console.log('Checking admin account for:', email)
     
     const user = await prisma.user.findUnique({
@@ -14,7 +14,7 @@ async function checkAdmin() {
 
     if (!user) {
       console.log('❌ User not found!')
-      console.log('Note: You typed "htesting22@gamil.com" but the account was created with "htesting22@gmail.com"')
+      console.log('Note: Please make sure you are querying the correct admin email address.')
       return
     }
 

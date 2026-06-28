@@ -62,7 +62,7 @@ async function verifyLogin(email, password) {
 
 async function main() {
     await verifyLogin('abdurrehmantalat@gmail.com', 'A7009674a!')
-    await verifyLogin('htesting22@gmail.com', 'A7009674a!')
+    await verifyLogin('admin@elegancestore.online', 'A7009674a!')
 }
 
 main()

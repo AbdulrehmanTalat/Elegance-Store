@@ -7,13 +7,13 @@ async function checkUsers() {
     const users = await prisma.user.findMany({
       where: {
         email: {
-          contains: 'htesting',
+          contains: 'admin',
           mode: 'insensitive',
         },
       },
     })
 
-    console.log('All users with "htesting" in email:')
+    console.log('All users with "admin" in email:')
     console.log('---')
     users.forEach(u => {
       console.log(`Email: "${u.email}"`)
@@ -25,13 +25,13 @@ async function checkUsers() {
 
     // Also check exact match
     const exactUser = await prisma.user.findUnique({
-      where: { email: 'htesting22@gmail.com' },
+      where: { email: 'admin@elegancestore.online' },
     })
 
     if (exactUser) {
-      console.log('✅ Exact match found for: htesting22@gmail.com')
+      console.log('✅ Exact match found for: admin@elegancestore.online')
     } else {
-      console.log('❌ No exact match for: htesting22@gmail.com')
+      console.log('❌ No exact match for: admin@elegancestore.online')
     }
 
   } catch (error) {
