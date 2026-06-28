@@ -717,6 +717,14 @@ export default function ProductModal({
                                       >
                                         <option value="">Select Size</option>
                                         <option value="Free Size">Free Size</option>
+                                        <option value="32">32</option>
+                                        <option value="34">34</option>
+                                        <option value="36">36</option>
+                                        <option value="38">38</option>
+                                        <option value="40">40</option>
+                                        <option value="42">42</option>
+                                        <option value="44">44</option>
+                                        <option value="46">46</option>
                                         <option value="XS">XS</option>
                                         <option value="S">S</option>
                                         <option value="M">M</option>
